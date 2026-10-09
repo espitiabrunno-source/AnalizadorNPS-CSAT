@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Análisis de atención, NPS y CSAT – CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3f4;--sf:#fff;--ink:#10242b;--mu:#586d75;--ln:#d3dfe2;--ac:#0b6f6a;--acs:#dcf1ef;--pro:#1a8a56;--pas:#b9810a;--det:#c33f2e;--sh:#e6eef0;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1a1f;--sf:#13262d;--ink:#e7f1f3;--mu:#9bb2b9;--ln:#27424a;--ac:#4cc9c0;--acs:#173b3c;--pro:#46c487;--pas:#e3a93a;--det:#ef7a68;--sh:#1b323a}}
+:root[data-theme="dark"]{--bg:#0c1a1f;--sf:#13262d;--ink:#e7f1f3;--mu:#9bb2b9;--ln:#27424a;--ac:#4cc9c0;--acs:#173b3c;--pro:#46c487;--pas:#e3a93a;--det:#ef7a68;--sh:#1b323a}
+*,*:before,*:after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 Figtree,system-ui,Segoe UI,sans-serif}
+h1,h2,h3{font-family:'Bricolage Grotesque',Figtree,system-ui,sans-serif;line-height:1.15;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between;margin-bottom:20px}
+h1{font-size:clamp(1.7rem,4vw,2.4rem);font-weight:800}
+header p{margin:6px 0 0;color:var(--mu);max-width:52ch}
+label{display:block;font-size:.88rem;color:var(--mu);margin-bottom:4px}
+input{width:100%;font:inherit;color:var(--ink);background:var(--sf);border:1.5px solid var(--ln);border-radius:8px;padding:9px 10px}
+input:focus-visible,button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.grid{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:880px){.grid{grid-template-columns:minmax(0,5fr) minmax(0,6fr);align-items:start}.sticky{position:sticky;top:16px}}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:18px;margin-bottom:16px}
+.card h2{font-size:1.25rem;margin-bottom:4px}
+.sub{color:var(--mu);font-size:.92rem;margin:0 0 14px}
+.row{display:grid;gap:10px;grid-template-columns:repeat(3,1fr)}
+.row5{grid-template-columns:repeat(5,1fr)}
+@media(max-width:700px){.row[style*="repeat(7"]{grid-template-columns:repeat(4,1fr)!important}}
+.row2{grid-template-columns:1fr 1fr}
+.row5 label{font-size:.78rem}
+.dot{display:inline-block;width:.7em;height:.7em;border-radius:50%;margin-right:5px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+button{font:inherit;font-weight:600;cursor:pointer;border-radius:8px;border:1.5px solid var(--ln);background:var(--sf);color:var(--ink);padding:8px 14px}
+button:hover{border-color:var(--ac)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kpi{background:var(--sh);border-radius:12px;padding:14px}
+.kpi small{color:var(--mu);display:block}
+.big{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(2.4rem,7vw,3.4rem);line-height:1}
+.tag{display:inline-block;margin-top:8px;padding:2px 10px;border-radius:99px;font-size:.84rem;font-weight:600;background:var(--acs);color:var(--ac)}
+.dist{display:flex;height:16px;border-radius:99px;overflow:hidden;margin:16px 0 6px;background:var(--sh)}
+.dist i{display:block;transition:width .35s}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--mu)}
+.scale{position:relative;height:8px;border-radius:99px;margin:10px 0 4px;background:linear-gradient(90deg,var(--det),var(--pas) 50%,var(--pro))}
+.mk{position:absolute;top:-5px;width:4px;height:18px;border-radius:2px;background:var(--ink);transform:translateX(-50%);transition:left .35s}
+.fb{display:grid;gap:10px;margin-top:4px}
+.it{border-left:5px solid var(--ln);background:var(--sh);border-radius:0 10px 10px 0;padding:10px 14px}
+.it b{display:block;font-size:.9rem}
+.it.bien{border-color:var(--pro)}.it.mej{border-color:var(--det)}.it.sig{border-color:var(--ac)}.it.av{border-color:var(--pas)}
+.it p{margin:2px 0 0}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button[aria-selected="true"]{background:var(--ac);border-color:var(--ac);color:var(--sf)}
+.pb h3{font-size:1.1rem;margin-bottom:6px}
+.pb ul{margin:4px 0 12px;padding-left:20px}
+.two{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:640px){.two{grid-template-columns:1fr 1fr}}
+.say{background:var(--acs);border-radius:10px;padding:10px 14px;font-style:italic}
+ol.cyc{margin:0;padding-left:22px}
+ol.cyc li{margin-bottom:8px}
+.empty{color:var(--mu);padding:8px 0}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+[hidden]{display:none!important}
+.nav{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.nav button[aria-selected="true"]{background:var(--ac);border-color:var(--ac);color:var(--sf)}
+.drop{border:2px dashed var(--ln);border-radius:14px;padding:22px;text-align:center;background:var(--sf);margin-bottom:16px}
+.drop.on{border-color:var(--ac);background:var(--acs)}
+.drop input{width:auto;border:0;padding:6px}
+.mu{color:var(--mu);font-size:.9rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.stats .kpi b{display:block;font:800 1.7rem 'Bricolage Grotesque',sans-serif}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:14px}
+.bar>div{min-width:200px}
+select{font:inherit;color:var(--ink);background:var(--sf);border:1.5px solid var(--ln);border-radius:8px;padding:9px 10px;width:100%}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--ln);vertical-align:top}
+.tw{overflow-x:auto}
+details.case{background:var(--sf);border:1px solid var(--ln);border-radius:14px;margin-bottom:12px}
+details.case>summary{cursor:pointer;padding:14px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.cbody{padding:0 16px 16px}
+.cbody h4{margin:14px 0 6px;font:700 1rem 'Bricolage Grotesque',sans-serif}
+.cbody ul{margin:0;padding-left:20px}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.82rem;font-weight:600;background:var(--sh)}
+.r-alto{background:var(--det);color:#fff}.r-medio{background:var(--pas);color:#fff}.r-bajo{background:var(--pro);color:#fff}
+.sc-a{color:var(--pro)}.sc-m{color:var(--pas)}.sc-b{color:var(--det)}
+.em{border:1px solid var(--ln);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.em.cli{background:var(--sh);border-style:dashed}
+.em .h{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.chip{font-size:.78rem;padding:1px 8px;border-radius:99px;border:1px solid var(--ln)}
+.chip.ok{border-color:var(--pro);color:var(--pro)}.chip.no{border-color:var(--det);color:var(--det)}
+.inv{border-color:var(--det)!important}
+tr.r-si td:first-child{box-shadow:inset 4px 0 0 var(--pas)}
+tr.r-no td:first-child{box-shadow:inset 4px 0 0 var(--pro)}
+td select,td input{min-width:150px}
+.kpi .sm{font-size:.8rem;color:var(--mu);display:block;margin-top:2px}
+.st2{margin:18px 0 6px}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+<nav class="nav" role="tablist" aria-label="Secciones">
+  <button type="button" role="tab" id="tA" aria-selected="true">Análisis del reporte de casos</button>
+  <button type="button" role="tab" id="tM" aria-selected="false">Matriz de calidad</button>
+  <button type="button" role="tab" id="tB" aria-selected="false">Calculadora NPS y CSAT</button>
+</nav>
+<div id="vAn">
+  <header>
+    <div>
+      <h1>Análisis de atención por caso</h1>
+      <p>Carga el reporte “Cases con correos” (Excel) y recibe por caso qué faltó, qué mejorar y la causa raíz sugerida según la matriz de calidad.</p>
+    </div>
+  </header>
+  <div class="drop" id="drop">
+    <p style="margin:0 0 8px"><b>Arrastra el archivo aquí o selecciónalo</b></p>
+    <input id="file" type="file" accept=".xlsx,.xls,.csv" aria-label="Cargar reporte de casos">
+    <p class="mu" style="margin:8px 0 0">El archivo se procesa solo en tu navegador: no se sube a ningún servidor ni se guarda.</p>
+    <div class="row row2" style="max-width:440px;margin:12px auto 0;text-align:left"><div><label for="pSla">SLA de respuesta (horas)</label><input id="pSla" type="number" min="1" value="24"></div><div><label for="pMail">Máx. correos de agente por caso</label><input id="pMail" type="number" min="1" value="4"></div></div>
+    <p class="mu" id="msgA" style="margin:6px 0 0" role="status"></p>
+  </div>
+  <div id="res" hidden>
+    <div class="stats" id="stats"></div>
+    <div class="card">
+      <h2>Resumen por agente</h2>
+      <p class="sub">El agente se toma de “Última modificación por” en cada correo enviado.</p>
+      <div class="tw"><table id="tAg"></table></div>
+    </div>
+    <div class="bar">
+      <div><label for="fAg">Ver solo mis correos</label><select id="fAg"></select></div>
+      <div><label for="fRi">Riesgo del caso</label><select id="fRi"><option value="">Todos</option><option value="alto">Alto</option><option value="medio">Medio</option><option value="bajo">Bajo</option></select></div>
+      <button type="button" id="csv">Descargar detalle (CSV)</button>
+    </div>
+    <div id="cases"></div>
+    <p class="mu">Los criterios son reglas automáticas sobre el texto del correo: sirven para priorizar la revisión, no reemplazan la evaluación de calidad. Si el reporte trae el cuerpo del correo cortado (cerca de 1.000 caracteres), el cierre no se evalúa.</p>
+  </div>
+</div>
+<div id="vMx" hidden>
+  <header><div><h1>Matriz de calidad</h1><p>Estándar que usa el equipo de calidad para clasificar la causa de insatisfacción de un detractor. Úsala para saber qué se espera de tu atención.</p></div></header>
+  <div class="card"><h2>Causa raíz</h2><div class="tw"><table id="mxR"></table></div></div>
+  <div class="card"><h2>Clasificación CSAT</h2><div class="tw"><table id="mxC"></table></div></div>
+  <div class="card"><h2>Causas secundarias y estándar esperado</h2><p class="sub">Las de Contact Center son las que dependen de la atención del agente.</p><div class="tw"><table id="mxT"></table></div></div>
+</div>
+<div id="vCalc" hidden>
+<header>
+  <div>
+    <h1>Mi NPS y CSAT</h1>
+    <p>Ingresa los resultados de tus encuestas, mira tus indicadores y recibe consejos concretos para atender mejor y ganar más promotores.</p>
+  </div>
+  <div style="min-width:220px"><label for="nombre">Tu nombre (opcional)</label><input id="nombre" type="text" placeholder="Ej. Camila Rojas" autocomplete="name"></div>
+</header>
+
+<div class="card" id="xCard">
+  <h2>Calculadora NPS y CSAT — GCCP + Sprinklr</h2>
+  <p class="sub">Carga cada base por separado. La fecha se detecta automáticamente desde el reporte; no tienes que seleccionar el día. Los indicadores oficiales de GCCP y Sprinklr se mantienen separados y luego se consolidan por hora y por especialista.</p>
+  <div class="row row2">
+    <div class="drop" style="margin:0;text-align:left"><b>Base GCCP</b><p class="mu" style="margin:4px 0">SurveyMonkey · usa Case Number, Date/Time Closed y Case Owner.</p><input id="xFileG" type="file" accept=".xlsx,.xls,.csv" aria-label="Cargar Excel GCCP" style="width:auto;border:0;padding:6px 0"></div>
+    <div class="drop" style="margin:0;text-align:left"><b>Base Sprinklr</b><p class="mu" style="margin:4px 0">Usa Case Id, Case Creation Time (Survey), CSAT y NPS.</p><input id="xFileS" type="file" accept=".xlsx,.xls,.csv" aria-label="Cargar Excel Sprinklr" style="width:auto;border:0;padding:6px 0"></div>
+  </div>
+  <div class="row" style="grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-top:12px">
+    <div><label>Fecha detectada del reporte</label><div class="kpi"><b id="xDay">–</b><span class="sm">Se toma automáticamente de los archivos cargados.</span></div></div>
+    <div><label>Reglas oficiales</label><div class="kpi"><b>NPS 9–10</b><span class="sm">Promotor · 7–8 Neutro · 1–6 Detractor<br>CSAT 6–7 Promotor · 1–5 Detractor</span></div></div>
+    <div><label>Estado de carga</label><div class="kpi"><b id="xState">Esperando archivos</b><span class="sm" id="xStateSm">GCCP y Sprinklr son fuentes independientes.</span></div></div>
+  </div>
+  <div class="btns" style="margin-top:12px;justify-content:flex-end"><button type="button" id="xReset" title="Borra GCCP, Sprinklr, atribuciones y resultados guardados en este navegador">↺ Resetear bases y resultados</button></div>
+  <p class="mu" id="xMsg" role="status" style="margin:10px 0 0"></p>
+  <p class="mu" style="margin:6px 0 0">Los archivos se procesan en tu navegador. No se mezclan con el Excel de análisis de casos. <b>El cálculo utiliza todas las bases cargadas: GCCP, Sprinklr o ambas. No es obligatorio cargar las dos.</b> El NPS/CSAT oficial nunca cambia por la clasificación de atribución.</p>
+  <div id="xOut" hidden>
+    <div class="stats st2" id="xSt"></div>
+    <h3 class="st2">Resultados por fuente</h3>
+    <div class="tw"><table id="xSrc"></table></div>
+    <h3 class="st2">Consolidado por hora — GCCP + Sprinklr</h3>
+    <div class="tw"><table id="xHr"></table></div>
+    <h3 class="st2">Consolidado por especialista</h3>
+    <p class="mu">GCCP usa <b>Case Owner</b>. Si una respuesta no trae especialista, puedes asignarla manualmente con el selector junto al caso. La asignación se aplica a los cálculos por especialista y al Excel exportado.</p>
+    <div class="tw"><table id="xSp"></table></div>
+    <h3 class="st2">🏆 Histórico de rachas por especialista</h3>
+    <p class="mu">Historial guardado en este navegador entre cargas. Criterio de racha: NPS diario positivo (mayor que 0) y CSAT diario de al menos 80%. Se felicita al alcanzar 3, 5, 7 o más días consecutivos.</p>
+    <div id="xCongrats" class="mu" style="margin:8px 0 12px"></div>
+    <div class="tw"><table id="xHist"></table></div>
+    <div class="btns" style="margin-top:8px"><button type="button" id="xHistReset">Borrar histórico de rachas</button></div>
+    <h3 class="st2">Atribución de detractores</h3>
+    <p class="mu" id="xRes" style="margin:0 0 8px"></p>
+    <div class="tw"><table id="xDt"></table></div>
+    <div class="btns" style="margin-top:14px"><button type="button" id="xExp">Exportar reporte a Excel</button><button type="button" id="xClr">Limpiar GCCP + Sprinklr</button></div>
+  </div>
+</div>
+<h2 style="margin:8px 0 12px">Calculadora manual</h2>
+<div class="grid">
+<section>
+  <div class="card">
+    <h2>NPS: ¿recomendarían tu atención?</h2>
+    <p class="sub">Cuenta cuántos clientes te calificaron de 0 a 10 en el periodo.</p>
+    <div class="row">
+      <div><label for="p"><span class="dot" style="background:var(--pro)"></span>Promotores (9–10)</label><input id="p" type="number" min="0" inputmode="numeric" placeholder="0"></div>
+      <div><label for="pa"><span class="dot" style="background:var(--pas)"></span>Pasivos (7–8)</label><input id="pa" type="number" min="0" inputmode="numeric" placeholder="0"></div>
+      <div><label for="d"><span class="dot" style="background:var(--det)"></span>Detractores (0–6)</label><input id="d" type="number" min="0" inputmode="numeric" placeholder="0"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>CSAT: ¿quedaron satisfechos?</h2>
+    <p class="sub">Cuenta cuántas calificaciones recibiste de 1 a 7.</p>
+    <div class="row" style="grid-template-columns:repeat(7,1fr)">
+      <div><label for="c1">1</label><input id="c1" type="number" min="0" inputmode="numeric" placeholder="0"></div>
+      <div><label for="c2">2</label><input id="c2" type="number" min="0" inputmode="numeric" placeholder="0"></div>
+      <div><label for="c3">3</label><input id="c3" type="number" min="0" inputmode="numeric" placeholder="0"></div>
+      <div><label for="c4">4</label><input id="c4" type="number" min="0" inputmode="numeric" placeholder="0"></div>
+      <div><label for="c5">5</label><input id="c5" type="number" min="0" inputmode="numeric" placeholder="0"></div>
+      <div><label for="c6">6 Satisfecho</label><input id="c6" type="number" min="0" inputmode="numeric" placeholder="0"></div>
+      <div><label for="c7">7 Muy satisfecho</label><input id="c7" type="number" min="0" inputmode="numeric" placeholder="0"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Mis metas</h2>
+    <p class="sub">Con ellas calculamos cuántos clientes más necesitas encantar.</p>
+    <div class="row row2">
+      <div><label for="metaN">Meta de NPS (−100 a 100)</label><input id="metaN" type="number" min="-100" max="100" inputmode="numeric" value="50"></div>
+      <div><label for="metaC">Meta de CSAT (%)</label><input id="metaC" type="number" min="1" max="99" inputmode="numeric" value="85"></div>
+    </div>
+    <div class="btns"><button id="limpiar" type="button">Limpiar datos</button></div>
+  </div>
+
+  <div class="card">
+    <h2>Atención correcta en 5 pasos</h2>
+    <p class="sub">El orden importa: así se construye un promotor.</p>
+    <ol class="cyc">
+      <li><b>Saluda y personaliza.</b> Di tu nombre, usa el nombre del cliente y confirma el motivo de su contacto.</li>
+      <li><b>Escucha y valida.</b> No interrumpas. Resume lo que entendiste y reconoce cómo se siente.</li>
+      <li><b>Resuelve o da una ruta clara.</b> Si no puedes resolver ahora, explica qué sigue, quién lo hace y cuándo.</li>
+      <li><b>Confirma y suma un extra.</b> Verifica que quedó resuelto y anticipa su próxima duda.</li>
+      <li><b>Cierra y pide su opinión.</b> Agradece e invita a la encuesta con naturalidad.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="sticky">
+  <div class="card" aria-live="polite">
+    <h2 id="titRes">Tus resultados</h2>
+    <p class="sub" id="muestra">Ingresa tus encuestas para ver tus indicadores.</p>
+    <div class="kpis">
+      <div class="kpi"><small>NPS</small><div class="big" id="vN">–</div><span class="tag" id="nN">Sin datos</span></div>
+      <div class="kpi"><small>CSAT</small><div class="big" id="vC">–</div><span class="tag" id="nC">Sin datos</span></div>
+    </div>
+    <div class="dist" id="dist" aria-hidden="true"><i id="gP" style="background:var(--pro);width:0"></i><i id="gA" style="background:var(--pas);width:0"></i><i id="gD" style="background:var(--det);width:0"></i></div>
+    <div class="leg"><span><span class="dot" style="background:var(--pro)"></span><span id="lP">Promotores 0%</span></span><span><span class="dot" style="background:var(--pas)"></span><span id="lA">Pasivos 0%</span></span><span><span class="dot" style="background:var(--det)"></span><span id="lD">Detractores 0%</span></span></div>
+    <div style="margin-top:14px"><small style="color:var(--mu)">Posición de tu NPS (de −100 a 100)</small><div class="scale"><div class="mk" id="mk" style="left:50%"></div></div></div>
+  </div>
+
+  <div class="card">
+    <h2>Feedback para ti</h2>
+    <p class="sub">Se actualiza con tus números.</p>
+    <div class="fb" id="fb"><div class="empty">Aquí aparecerán tus fortalezas, puntos a mejorar y el plan para ganar más promotores.</div></div>
+  </div>
+</section>
+</div>
+
+<div class="card" style="margin-top:4px">
+  <h2>Cómo atender a cada tipo de cliente</h2>
+  <p class="sub">Elige la situación que estás viviendo en la llamada, el chat o el correo.</p>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div class="pb" id="pb" role="tabpanel"></div>
+</div>
+</div>
+</div>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+var IDS=['nombre','p','pa','d','c1','c2','c3','c4','c5','c6','c7','metaN','metaC'];
+function n(i){var v=parseInt($(i).value,10);return isNaN(v)||v<0?0:v}
+function pct(a,b){return b?Math.round(a/b*100):0}
+
+function nivelN(v){if(v<0)return'Crítico';if(v<30)return'Por mejorar';if(v<50)return'Bueno';if(v<70)return'Excelente';return'Clase mundial'}
+function nivelC(v){if(v<70)return'Crítico';if(v<80)return'Por mejorar';if(v<90)return'Bueno';return'Excelente'}
+
+function falta(meta,tot,base,fn){var g=meta/100;if(g>=1)return null;var x=Math.ceil(fn(g)/(1-g));return Math.max(0,x)}
+
+function calc(){
+  var P=n('p'),A=n('pa'),D=n('d'),T=P+A+D;
+  var c=[n('c1'),n('c2'),n('c3'),n('c4'),n('c5'),n('c6'),n('c7')],CT=c.reduce(function(a,b){return a+b},0),S=c[5]+c[6];
+  var nombre=$('nombre').value.trim();
+  $('titRes').textContent=nombre?'Resultados de '+nombre:'Tus resultados';
+  var nps=T?Math.round((P-D)/T*100):null, csat=CT?Math.round(S/CT*1000)/10:null;
+  $('vN').textContent=nps===null?'–':(nps>0?'+':'')+nps;
+  $('nN').textContent=nps===null?'Sin datos':nivelN(nps);
+  $('vC').textContent=csat===null?'–':csat+'%';
+  $('nC').textContent=csat===null?'Sin datos':nivelC(csat);
+  var pp=pct(P,T),pa=pct(A,T),pd=T?100-pp-pa:0;
+  $('gP').style.width=pp+'%';$('gA').style.width=pa+'%';$('gD').style.width=pd+'%';
+  $('lP').textContent='Promotores '+pp+'%';$('lA').textContent='Pasivos '+pa+'%';$('lD').textContent='Detractores '+pd+'%';
+  $('mk').style.left=(nps===null?50:(nps+100)/2)+'%';
+  $('muestra').textContent=(T||CT)?'Encuestas NPS: '+T+' · Encuestas CSAT: '+CT:'Ingresa tus encuestas para ver tus indicadores.';
+  feedback({P:P,A:A,D:D,T:T,pp:pp,pa:pa,pd:pd,nps:nps,CT:CT,S:S,csat:csat,c:c});
+  try{var o={};IDS.forEach(function(i){o[i]=$(i).value});localStorage.setItem('nps_csat_agente',JSON.stringify(o))}catch(e){}
+}
+
+function feedback(r){
+  var out=[];
+  function add(t,h,p){out.push('<div class="it '+t+'"><b>'+h+'</b><p>'+p+'</p></div>')}
+  if(!r.T&&!r.CT){$('fb').innerHTML='<div class="empty">Aquí aparecerán tus fortalezas, puntos a mejorar y el plan para ganar más promotores.</div>';return}
+  if((r.T&&r.T<30)||(r.CT&&r.CT<30))add('av','Muestra pequeña','Con menos de 30 encuestas un solo cliente mueve mucho tus números. Úsalos como guía y revisa la tendencia semana a semana.');
+  if(r.T){
+    if(r.pp>=50)add('bien','Tus promotores son mayoría','El '+r.pp+'% de tus clientes te recomendaría. Identifica qué hiciste en esas atenciones (tono, rapidez, el extra) y conviértelo en tu rutina.');
+    else if(r.nps>=30)add('bien','Buen vínculo con tus clientes','Tu NPS de '+r.nps+' muestra que generas confianza. El siguiente salto está en tus pasivos.');
+    if(r.pd>20)add('mej','Demasiados detractores ('+r.pd+'%)','Revisa uno por uno los casos mal calificados: ¿hubo espera, información incorrecta, falta de empatía o un problema que quedó sin cerrar? Si tu protocolo lo permite, haz seguimiento en 24 horas a quien quedó molesto.');
+    else if(r.pd>10)add('av','Detractores a vigilar ('+r.pd+'%)','Aún no es alarmante, pero cada detractor suele repetir un patrón. Anota el motivo de cada uno y corrige el más frecuente primero.');
+    if(r.pa>=35)add('av','Tu mayor oportunidad: los pasivos ('+r.pa+'%)','Estos clientes quedaron conformes, pero no emocionados. Lo que los convierte en promotores es un detalle de más: resolver la duda siguiente antes de que la pregunten, confirmar que todo quedó listo y despedirte con calidez.');
+    var meta=parseInt($('metaN').value,10);
+    if(!isNaN(meta)){
+      if(r.nps>=meta)add('bien','Meta de NPS cumplida','Estás en '+r.nps+' y tu meta es '+meta+'. Mantén tus hábitos y comparte tus mejores casos con tu equipo.');
+      else if(meta<100){var x=Math.max(1,Math.ceil((meta/100*r.T-r.P+r.D)/(1-meta/100)));add('sig','Te faltan '+x+' promotor'+(x===1?'':'es')+' para tu meta','Si las próximas '+x+' encuestas fueran de promotores, tu NPS llegaría a '+meta+'. Piensa en cada atención como la oportunidad de ser uno de esos '+x+'.')}
+    }
+  }
+  if(r.CT){
+    var bad=r.c[0]+r.c[1]+r.c[2]+r.c[3]+r.c[4];
+    if(r.csat>=90)add('bien','CSAT excelente','Resuelves de forma consistente. Sigue confirmando con el cliente que su caso quedó cerrado antes de colgar.');
+    else if(r.csat>=80)add('bien','Buena satisfacción','Tu CSAT está sólido. Para llegar a 90%, enfócate en reducir las calificaciones de 1 a 5.');
+    if(r.csat<70)add('mej','CSAT bajo ('+r.csat+'%)','Suele indicar problemas de resolución o de tiempos. Revisa que dominas el proceso, que no transfieres sin explicar y que cierras con un resumen de lo acordado.');
+    if(bad>0&&pct(bad,r.CT)>=15)add('mej','Calificaciones de 1 a 5: '+pct(bad,r.CT)+'%','Escucha tus grabaciones o relee esos chats. Busca si el cliente tuvo que repetir su problema, si esperó mucho o si no sintió que lo escuchaste.');
+    var mc=parseInt($('metaC').value,10);
+    if(!isNaN(mc)&&r.csat<mc&&mc<100){var y=Math.max(1,Math.ceil((mc/100*r.CT-r.S)/(1-mc/100)));add('sig','Te faltan '+y+' calificación'+(y===1?'':'es')+' de 6 o 7','Con '+y+' encuestas satisfechas más, tu CSAT llegaría a '+mc+'%.')}
+  }
+  if(r.T&&r.CT){
+    if(r.csat>=85&&r.nps<30)add('av','Resuelves, pero no conectas','Tu CSAT es alto y tu NPS es bajo: los clientes quedan satisfechos, pero no emocionados. Trabaja la empatía, personaliza la conversación y ofrece un extra.');
+    if(r.csat<75&&r.nps>=30)add('av','Clientes leales con fallas puntuales','Tu NPS es bueno, pero tu CSAT indica errores en resolución o tiempos. Cuida los detalles técnicos para no desgastar esa confianza.');
+  }
+  $('fb').innerHTML=out.join('');
+}
+
+var PB=[
+{k:'Molesto',t:'Cliente molesto o enojado',s:'Voz alta, reclamos, repite lo mismo, dice “ya llamé tres veces”.',h:['Deja que se desahogue sin interrumpir y no lo tomes personal.','Reconoce el problema y pide disculpas por la molestia, aunque no sea tu error.','Resume su caso para que sienta que no tendrá que repetirlo.','Ofrece una solución con tiempos reales y cúmplelos.'],e:['Decir “no es mi culpa” o “cálmese”.','Prometer lo que no controlas.','Transferir sin explicar el motivo.'],f:'“Entiendo lo frustrante que ha sido esto, y lamento que haya tenido que llamar varias veces. Voy a encargarme de su caso ahora mismo.”'},
+{k:'Confundido',t:'Cliente con dudas o confundido',s:'Hace muchas preguntas, no entiende el proceso, pide que le expliquen otra vez.',h:['Habla simple, sin tecnicismos ni siglas internas.','Explica paso a paso y verifica: “¿Voy bien hasta aquí?”','Al final, resume en dos frases lo que debe hacer.','Ofrece enviarle las instrucciones por escrito.'],e:['Hablar rápido o dar todo de una vez.','Asumir que ya sabe cómo funciona.','Cerrar sin confirmar que entendió.'],f:'“Se lo explico paso a paso para que quede claro. Dígame si algo no se entiende y lo vemos de otra forma.”'},
+{k:'Apurado',t:'Cliente apurado',s:'Dice que tiene poco tiempo, responde cortante, quiere ir directo.',h:['Ve al grano: pregunta lo esencial y ofrece la solución de inmediato.','Evita charla de relleno y guiones largos.','Anticipa lo siguiente para que no tenga que volver a llamar.','Cierra rápido, confirmando que todo quedó resuelto.'],e:['Hacer preguntas que ya respondió.','Dejar silencios largos sin avisar.','Alargar el cierre.'],f:'“Voy directo a resolverlo. Dame un momento mientras reviso y en un minuto le confirmo.”'},
+{k:'Pasivo',t:'Cliente neutral (el pasivo)',s:'Educado y tranquilo, pero sin emoción. Califica con 7 u 8.',h:['Agrega un detalle de valor: un consejo, un atajo o una verificación extra.','Anticipa su próxima necesidad antes de que la plantee.','Personaliza: usa su nombre y menciona su caso concreto.','Cierra con calidez y confirma que todo quedó claro.'],e:['Atender en piloto automático.','Despedirte con la frase de siempre.','Dar solo lo mínimo.'],f:'“Ya quedó resuelto. Le recomiendo también revisar esto, así evita que le pase de nuevo. ¿Le puedo ayudar con algo más?”'},
+{k:'Fiel',t:'Cliente satisfecho o fiel',s:'Agradece, es amable, ya te conoce o te ha pedido por nombre.',h:['Agradece su confianza y reconoce su lealtad.','Pregunta cómo ha sido su experiencia y toma nota de ideas.','Invítalo con naturalidad a responder la encuesta.','Haz que su mejor experiencia se repita en cada contacto.'],e:['Dar por hecho que siempre estará contento.','Perder el nivel de atención por confianza.','Pedir la encuesta con presión.'],f:'“Gracias por su confianza, me alegra haberle ayudado. Si recibe una breve encuesta, su opinión nos ayuda mucho.”'}
+];
+function showPB(i){
+  var p=PB[i];
+  [].forEach.call($('tabs').children,function(b,j){b.setAttribute('aria-selected',j===i?'true':'false')});
+  $('pb').innerHTML='<h3>'+p.t+'</h3><p class="sub">'+p.s+'</p><div class="two"><div><b>Haz esto</b><ul>'+p.h.map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul></div><div><b>Evita</b><ul>'+p.e.map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul></div></div><div class="say">'+p.f+'</div>';
+}
+PB.forEach(function(p,i){var b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.textContent=p.k;b.onclick=function(){showPB(i)};$('tabs').appendChild(b)});
+showPB(0);
+
+try{var s=JSON.parse(localStorage.getItem('nps_csat_agente')||'null');if(s)IDS.forEach(function(i){if(s[i]!==undefined)$(i).value=s[i]})}catch(e){}
+IDS.forEach(function(i){$(i).addEventListener('input',calc)});
+$('limpiar').onclick=function(){IDS.forEach(function(i){if(i==='metaN')$(i).value=50;else if(i==='metaC')$(i).value=85;else $(i).value=''});calc()};
+calc();
+</script>
+<script>
+(function(){
+var $a=function(i){return document.getElementById(i)};
+var D=null,LAST=null;
+function s(v){return v==null?'':String(v)}
+function esc(t){return s(t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function pdate(v){
+  if(v instanceof Date)return v;
+  if(typeof v==='number'&&typeof XLSX!=='undefined'){var o=XLSX.SSF.parse_date_code(v);return new Date(o.y,o.m-1,o.d,o.H,o.M)}
+  var m=/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})\s*(?:([ap])\.?\s?m\.?)?)?/i.exec(s(v));
+  if(!m)return null;
+  var h=+(m[4]||0);
+  if(m[6]){var pm=/p/i.test(m[6]);if(pm&&h<12)h+=12;if(!pm&&h===12)h=0}
+  return new Date(+m[3],+m[2]-1,+m[1],h,+(m[5]||0));
+}
+function fdate(d){return d?('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2):'sin fecha'}
+function fdur(h){return h<1?Math.max(1,Math.round(h*60))+' min':h<48?(Math.round(h*10)/10)+' h':(Math.round(h/24*10)/10)+' días'}
+function cleanAg(b){return s(b).replace(/\u00a0/g,' ').split('Centro de Cuidado al Consumidor')[0].trim()}
+function cleanCli(b){b=s(b).replace(/\u00a0/g,' ');var m=b.search(/\n\s*(El|On)\s[\s\S]{3,140}?(escribió|wrote)|\n\s*>|\nDe:|\nFrom:/);return(m>0?b.slice(0,m):b).trim()}
+
+var STOP=/^(esperamos|gracias|queremos|antes|nos|le|para|agradecemos|lamentamos|reciba|hemos|por|en|tu|su|muchas|claro|con|saludos|como|seg[uú]n)$/i;
+function saludo(t){var m=/^\s*(?:hola|buen[oa]s?\s+(?:d[ií]as|tardes|noches)|buen\s+d[ií]a|estimad[oa]s?)[\s,!¡:]*([A-Za-zÁÉÍÓÚÑáéíóúñ]+)/i.exec(t);return !!m&&!STOP.test(m[1])}
+var RX={
+ emp:/lamentamos|lamento|disculp|sentimos|entendemos|comprendemos|nos preocupa|me preocupa|no est[aá]s sola|de coraz[oó]n/i,
+ gra:/gracias|agradecemos|agradezco/i,
+ sig:/procederemos|enviaremos|escalad|remitiendo|derivar|informaremos|estaremos en contacto|necesitamos|nos compartas|nos puedas|por favor|hemos enviado|hemos recibido|solicit|quedamos atent/i,
+ plz:/\d+\s*(d[ií]as|horas|semanas)|h[aá]biles|a la brevedad|a m[aá]s tardar|en un plazo|lo antes posible|pr[oó]ximas horas/i,
+ cie:/cualquier (otra )?(consulta|duda|pregunta)|en qu[eé] m[aá]s|no dudes|no dude|con gusto|ser[aá] un placer|excelente d[ií]a|buen d[ií]a|a tu disposici[oó]n|estamos aqu[ií]|encantados/i,
+ sal:/dermat[oó]log|profesional de la salud|m[eé]dico|atenci[oó]n m[eé]dica/i,
+ seg:/seguridad del producto|farmacovigilancia/i
+};
+var NOM={saludo:'Saludo personalizado',emp:'Empatía o disculpa',gra:'Agradecimiento',sig:'Próximos pasos claros',plz:'Plazo o tiempo estimado',cie:'Cierre cordial'};
+var TIP={
+ saludo:'Empieza con “Hola” y el nombre del cliente para que sienta que le escribe una persona, no un sistema.',
+ emp:'Falta reconocer cómo se siente el cliente. Una frase de empatía antes de pedir datos cambia el tono de todo el correo.',
+ gra:'Agradece que el cliente se tomó el tiempo de escribir o de enviar la información.',
+ sig:'No quedó claro qué sigue. Dile qué harás tú, qué debe hacer él y cuándo tendrá noticias.',
+ plz:'Hay un trámite pendiente sin tiempo estimado. Da un plazo realista; sin él, el cliente vuelve a escribir.',
+ cie:'Cierra invitando a escribir si tiene dudas y con un deseo cordial.'
+};
+
+function evalMsg(m,prev){
+  var t=m.txt,c=[];
+  c.push({k:'saludo',ok:saludo(t)});
+  c.push({k:'emp',ok:RX.emp.test(t)});
+  c.push({k:'gra',ok:RX.gra.test(t)});
+  var sig=RX.sig.test(t);
+  c.push({k:'sig',ok:sig});
+  if(sig)c.push({k:'plz',ok:RX.plz.test(t)});
+  if(!m.trunc)c.push({k:'cie',ok:RX.cie.test(t)});
+  var ok=c.filter(function(x){return x.ok}).length;
+  m.chk=c;m.pct=Math.round(ok/c.length*100);
+  m.dup=false;
+  if(prev){
+    var a=t.toLowerCase().split(/\W+/).filter(Boolean),b=prev.txt.toLowerCase().split(/\W+/).filter(Boolean);
+    var A={},B={},i,inter=0,uni=0;
+    a.forEach(function(w){A[w]=1});b.forEach(function(w){B[w]=1});
+    for(i in A){uni++;if(B[i])inter++}
+    for(i in B){if(!A[i])uni++}
+    m.dup=uni>0&&inter/uni>0.85;
+  }
+}
+
+function P(){var a=+$a('pSla').value,b=+$a('pMail').value;return{sla:a>0?a:24,mail:b>0?b:4}}
+var GS='Explica el motivo con empatía, ofrece la alternativa disponible y confirma los pasos y plazos.';
+var RAIZ=[
+ ['Contact Center','El equipo no hizo el proceso establecido o no cumplió los conceptos de CX.'],
+ ['Process','El proceso se hizo correctamente, pero generó insatisfacción en el consumidor.'],
+ ['Product','Solo el producto causó la insatisfacción.'],
+ ['Consumer Expectation','El consumidor esperaba recibir más de lo que recibió.'],
+ ['None','No existe causa secundaria.'],
+ ['Others','Ninguna de las anteriores explica la razón.']];
+var CSATC=[
+ ['Response Quality','Calidad de la respuesta: empatía, personalización y cuidado en la atención.'],
+ ['Response Time','Tiempo de respuesta de la interacción.'],
+ ['Interaction Quality','Calidad de la interacción: leer bien los correos y responder de forma adecuada a lo que el cliente envió.'],
+ ['Dissatisfied w Product','Insatisfecho con el producto.'],
+ ['Dissatisfied w Company','Insatisfecho con la empresa: procesos.']];
+var QM=[
+ ['sla','Contact Center','Interaction Quality – SLA','El tiempo de respuesta fue largo y afectó la percepción de una solución ágil.','Responde dentro del SLA; si necesitas más tiempo, avisa al cliente y dale una fecha.'],
+ ['probing','Contact Center','Interaction Quality – Probing','El sondeo fue incompleto, incorrecto o no se hizo, y eso afectó la solución.','Haz en el primer correo las preguntas necesarias para resolver sin volver a escribir.'],
+ ['conexion','Contact Center','Interaction Quality – Connection','El mensaje no mostró conexión emocional ni preocupación por lo ocurrido.','Reconoce con tus palabras lo que vivió el cliente antes de pedir datos.'],
+ ['personal','Contact Center','Interaction Quality – Personalization','Se usó un mensaje genérico que serviría a cualquier consumidor.','Usa su nombre y retoma elementos concretos de lo que escribió.'],
+ ['lectura','Contact Center','Interaction Quality – Reading / Active Listening','Se preguntó algo que el cliente ya había informado.','Lee el hilo completo y quita del speech lo que ya respondió.'],
+ ['speech','Contact Center','Interaction Quality – Improper Use of Speech','Había un speech vigente y se usó otro inadecuado o ninguno.','Usa el speech vigente que corresponde al motivo y adáptalo al caso.'],
+ ['exceso','Contact Center','Interaction Quality – Excessive Emails','Hubo correos innecesarios que se evitaban preguntando bien al inicio o aclarando por llamada.','Reúne todo en un solo correo y, si se puede, resuelve por teléfono.'],
+ ['info','Contact Center','Interaction Quality – Incomplete / Incorrect Information','No se dio información al cliente o se dio errónea; incluye negar un reembolso aplicable o cualquier error de proceso.','Verifica la política antes de responder y entrega toda la información, con alternativa y plazo.'],
+ ['multi','Contact Center','Interaction Quality – Multiple Factors','Más de un elemento de calidad de la interacción causó insatisfacción.','Corrige cada elemento por separado: tiempo, lectura, personalización e información.'],
+ ['datos','Process','Process – Request for Personal Data','El consumidor se niega a dar los datos personales necesarios para continuar.',GS],
+ ['reemb','Process','Process – Refund / Replacement','Sin retrasos, el consumidor está insatisfecho con el plazo o el proceso de reembolso o reposición.',GS],
+ ['rdelay','Process','Process – Refund / Replacement Delay / Within SLA','El plazo de reembolso o reposición se pasó del plazo inicial, o sigue vigente pero el cliente cuestiona la espera.','Informa el plazo real desde el primer correo y haz seguimiento antes de que el cliente pregunte.'],
+ ['rdis','Process','Process – Disagrees with Refund','Prefiere la reposición del producto y la única opción es el reembolso.',GS],
+ ['muestra','Process','Process – Sample or Donation Request','CCC explica bien que no entrega muestras y el cliente no está de acuerdo.',GS],
+ ['visita','Process','Process – Request for Representative Visit','Un profesional de punto de venta o de salud pide visita y no acepta llenar los datos para el calendario de representantes.',GS],
+ ['mkt','Process','Process – Marketing Request','No está de acuerdo con la respuesta correcta sobre alianzas, influencers u otros temas de marketing.',GS],
+ ['promo','Process','Process – Promotion','No está de acuerdo con las reglas de la promoción vigente.',GS],
+ ['distrib','Process','Process – Distribuidor Request','El punto de venta no está conforme con contactar al distribuidor indicado para compra al por mayor.',GS],
+ ['kcont','Process','Process – Kenvue Contacts','No está de acuerdo con la postura de CCC frente a Kenvue (por ejemplo, RR. HH. que debe usar otro canal).',GS],
+ ['templ','Process','Process – Email Template','La plantilla se usó correctamente, pero el texto puede mejorarse.','Personaliza la plantilla con los datos del caso.'],
+ ['flujo','Process','Process – Long Workflow (Effort)','El flujo del proceso es largo y aumenta el esfuerzo del consumidor.','Reduce pasos: pide todo junto y evita ida y vuelta innecesaria.'],
+ ['excdatos','Process','Process – Excessive Data Requested','El consumidor cuestiona o se muestra insatisfecho por la cantidad de datos pedidos (cuestionario, correo, datos personales, fotos).','Pide solo lo indispensable, todo en un único mensaje, y explica para qué sirve cada dato.'],
+ ['med','Process','Process – Inappropriate MED Questionnaire','Insatisfacción por llenar un cuestionario médico por uso incorrecto (MISUSE) o beneficio adicional (THERABEN).',GS],
+ ['ing','Process','Process – Ingredient query','La matriz no trae descripción para esta causa.',GS],
+ ['ae','Product','Product – Adverse Event / Reaction','Solo cuando el evento adverso fue la causa de la insatisfacción con el servicio.','Atiende primero la salud del cliente, escala a Seguridad del Producto y mantén el seguimiento.'],
+ ['feat','Product','Product – Feature','La insatisfacción vino de una característica del producto y no de un defecto real (olor, textura).',GS],
+ ['qual','Product','Product – Quality Issue','Problema de calidad no característico del producto (adhesividad, envase, textura, olor).',GS],
+ ['disc','Product','Product – Discontinued','CCC ofreció un reemplazo e informó sus beneficios y aun así el cliente quedó insatisfecho por el descontinuado.',GS],
+ ['compra','Product','Product – Difficulty Purchasing','CCC indicó dónde comprar y aun así el cliente no encuentra fácil dónde.',GS],
+ ['falla','Product','Product – Involuntary or Accidental Failure','Se niega cambio o reembolso por mal uso o daño causado por el consumidor (se cayó, lo compró vencido, confundió el envase).',GS],
+ ['dudas','Product','Product – General Questions','CCC respondió completa y correctamente y el cliente no está de acuerdo con la aclaración.',GS],
+ ['mayor','Product','Product – Wholesale Purchase','Quiere comprar al por mayor y no acepta que Kenvue no vende a particulares.',GS]
+];
+var QMX={};QM.forEach(function(q){QMX[q[0]]=q});
+var MXL={saludo:'Interaction Quality – Personalization',emp:'Interaction Quality – Connection',gra:'Response Quality',sig:'Interaction Quality – Incomplete / Incorrect Information',plz:'Interaction Quality – Incomplete / Incorrect Information',cie:'Response Quality'};
+var CCIDS=['sla','exceso','lectura','personal','conexion','info','probing'],PRIDS=['flujo','excdatos','rdelay','rdis'];
+
+function clasif(c,am,cli,docs,neg,all){
+  var p=P(),it=[];
+  function add(id,nv,ev){for(var i=0;i<it.length;i++)if(it[i].id===id){it[i].ev+=' '+ev;if(nv==='probable')it[i].nv=nv;return}it.push({id:id,nv:nv,ev:ev})}
+  var ds=c.msgs.filter(function(m){return m.d}).map(function(m){return m.d.getTime()});
+  var span=ds.length?(Math.max.apply(null,ds)-Math.min.apply(null,ds))/864e5:0;
+  if(c.maxDelay>p.sla)add('sla','probable','La respuesta más lenta tardó '+fdur(c.maxDelay)+' (SLA configurado: '+p.sla+' h).');
+  if(c.pend&&c.pend.dias*24>p.sla)add('sla','probable','El cliente lleva '+fdur(c.pend.dias*24)+' sin respuesta.');
+  if(c.nAg>p.mail)add('exceso','probable','Se enviaron '+c.nAg+' correos de agente (máximo esperado: '+p.mail+').');
+  if(am.some(function(m){return m.dup}))add('personal','posible','Hay un correo casi idéntico al anterior, lo que se lee como mensaje genérico.');
+  var ns=am.filter(function(m){return m.chk.some(function(x){return x.k==='saludo'&&!x.ok})}).length;
+  if(ns)add('personal','probable',ns+' correo(s) sin saludo con el nombre del cliente.');
+  var ne=am.filter(function(m){return m.chk.some(function(x){return x.k==='emp'&&!x.ok})}).length;
+  if(neg&&ne)add('conexion','probable','El cliente expresó malestar y '+ne+' correo(s) no muestran empatía.');
+  else if(ne>=2)add('conexion','posible',ne+' correos sin una frase de empatía.');
+  if(/no cuento|no tengo|la tir[eé]|no la conserv|ya (te|les|le) (envi|mand|compart)/.test(cli)&&docs>=2)add('lectura','posible','El cliente informó que no tiene un documento o que ya lo envió, y se volvió a pedir documentación en '+docs+' correos.');
+  var nq=am.filter(function(m){return m.chk.some(function(x){return x.k==='plz'&&!x.ok})}).length;
+  if(nq>=2)add('info','posible',nq+' correos con trámite pendiente y sin plazo estimado.');
+  if(c.med&&am.length&&!RX.seg.test(all))add('info','posible','No se informó el escalamiento a Seguridad del Producto.');
+  if(c.nCli>=4||span>14)add('flujo','posible','El caso lleva '+Math.round(span)+' días y '+c.nCli+' mensajes del cliente.');
+  var quejaDatos=/demasiad|tantos|muchos datos|otra vez|de nuevo|ya (les|te|le) (di|envi)/.test(cli);
+  if(quejaDatos)add('excdatos','probable','El cliente cuestiona los datos o documentos que se le piden.');
+  else if(docs>=3)add('excdatos','posible','Se pidieron documentos en '+docs+' correos distintos.');
+  var ref=/reembols/i.test(all);
+  if(ref&&/cu[aá]ndo|todav[ií]a no|a[uú]n no|sigo esperando|ya pas[oó]|cu[aá]nto (tarda|demora)/.test(cli))add('rdelay','posible','El cliente pregunta por el avance del reembolso: verifica si está dentro del plazo o ya se pasó.');
+  if(ref&&/prefiero (el )?cambio|reposici[oó]n|quiero (un )?cambio/.test(cli))add('rdis','posible','El cliente pide cambio o reposición y la opción ofrecida es reembolso.');
+  if(c.med)add('ae','posible','El caso trae motivos de salud ('+c.sub+'). Se clasifica como Producto solo si el evento adverso fue la causa de la insatisfacción con el servicio.');
+  it.sort(function(a,b){return(a.nv==='probable'?0:1)-(b.nv==='probable'?0:1)});
+  function has(ids,nv){return it.some(function(x){return ids.indexOf(x.id)>=0&&(!nv||x.nv===nv)})}
+  var raiz=has(CCIDS,'probable')?'Contact Center':has(PRIDS,'probable')?'Process':has(CCIDS)?'Contact Center (a validar)':has(PRIDS)?'Process (a validar)':has(['ae'])?'Product (a validar)':'Sin causa evidente';
+  var multi=it.filter(function(x){return CCIDS.indexOf(x.id)>=0&&x.nv==='probable'}).length>=2;
+  var top=it.filter(function(x){return x.nv==='probable'})[0]||it[0];
+  var csat=!top?'Sin clasificación':top.id==='sla'?'Response Time':(top.id==='personal'||top.id==='conexion')?'Response Quality':top.id==='ae'?'Dissatisfied w Product':PRIDS.indexOf(top.id)>=0?'Dissatisfied w Company':'Interaction Quality';
+  return{raiz:raiz,csat:csat,multi:multi,items:it};
+}
+function mxHtml(c){
+  var m=c.mx;if(!m.items.length)return'';
+  var h='<h4>Clasificación sugerida según la matriz de calidad</h4><p><span class="pill">Causa raíz: '+esc(m.raiz)+'</span> <span class="pill">CSAT: '+esc(m.csat)+'</span>'+(m.multi?' <span class="pill">Multiple Factors</span>':'')+'</p><ul>';
+  m.items.forEach(function(x){var q=QMX[x.id];h+='<li><b>'+esc(q[2])+'</b> ('+x.nv+'): '+esc(x.ev)+'<br><span class="mu">Estándar esperado: '+esc(q[4])+'</span></li>'});
+  return h+'</ul><p class="mu">Es una sugerencia automática basada en reglas; el analista de calidad confirma la clasificación.</p>';
+}
+function buildMx(){
+  $a('mxR').innerHTML='<tr><th>Causa raíz</th><th>Cuándo aplica</th></tr>'+RAIZ.map(function(r){return'<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td></tr>'}).join('');
+  $a('mxC').innerHTML='<tr><th>Clasificación CSAT</th><th>Cuándo aplica</th></tr>'+CSATC.map(function(r){return'<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td></tr>'}).join('');
+  $a('mxT').innerHTML='<tr><th>Causa raíz</th><th>Causa secundaria</th><th>Cuándo aplica</th><th>Qué se espera de ti</th></tr>'+QM.map(function(q){return'<tr><td>'+esc(q[1])+'</td><td><b>'+esc(q[2])+'</b></td><td>'+esc(q[3])+'</td><td>'+esc(q[4])+'</td></tr>'}).join('');
+}
+
+function analyze(aoa){
+  var hi=-1,i,j;
+  for(i=0;i<aoa.length&&hi<0;i++){if(aoa[i].some(function(c){return s(c).trim()==='Número del caso'}))hi=i}
+  if(hi<0)throw new Error('No encontré la columna “Número del caso”. Verifica que sea el reporte “Cases con correos”.');
+  var h=aoa[hi].map(function(c){return s(c).trim()});
+  function ix(n,k){var c=0;for(var j=0;j<h.length;j++)if(h[j]===n){if(c===(k||0))return j;c++}return -1}
+  var C={caso:ix('Número del caso'),est:ix('Estado',0),mod:ix('Última modificación por: Nombre completo'),de:ix('Nombre De'),cu:ix('Cuerpo del texto'),or:ix('Dirección de origen'),fe:ix('Fecha del mensaje'),pais:ix('Country Marketed'),marca:ix('Insert Brand'),sku:ix('Product Description (SKU)'),sub:ix('Subjects')};
+  if(C.cu<0||C.fe<0||C.or<0)throw new Error('Faltan columnas del reporte (Cuerpo del texto, Dirección de origen o Fecha del mensaje).');
+  var rd=new Date();
+  for(i=0;i<hi;i++){var mm=/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})/.exec(s(aoa[i].join(' ')));if(mm){rd=new Date(+mm[1],+mm[2]-1,+mm[3],+mm[4],+mm[5]);break}}
+  var cases={},order=[];
+  for(i=hi+1;i<aoa.length;i++){
+    var r=aoa[i],id=s(r[C.caso]).trim();
+    if(!/^\d+$/.test(id))continue;
+    if(!cases[id]){cases[id]={id:id,marca:s(r[C.marca]),sku:s(r[C.sku]),pais:s(r[C.pais]),sub:s(r[C.sub]),est:s(r[C.est]),msgs:[]};order.push(id)}
+    var or=s(r[C.or]).toLowerCase(),de=s(r[C.de]);
+    var tipo=/noreply|no-reply/.test(or)?'auto':(/@kenvue\.com/.test(or)||/kenvue/i.test(de))?'agente':'cliente';
+    var raw=s(r[C.cu]);
+    cases[id].msgs.push({tipo:tipo,ag:s(r[C.mod]),de:de,d:pdate(r[C.fe]),n:i,trunc:raw.length>=990,txt:tipo==='agente'?cleanAg(raw):cleanCli(raw)});
+  }
+  if(!order.length)throw new Error('No encontré casos con número en el archivo.');
+  var ag={},list=[];
+  order.forEach(function(id){
+    var c=cases[id];
+    c.msgs=c.msgs.filter(function(m){return m.tipo!=='auto'}).sort(function(a,b){return((a.d?a.d.getTime():0)-(b.d?b.d.getTime():0))||(a.n-b.n)});
+    var pend=null,prev=null,delays=[],agNames={},cliTxt='',agMsgs=[];
+    c.msgs.forEach(function(m){
+      if(m.tipo==='cliente'){if(!pend)pend=m;cliTxt+=' '+m.txt}
+      else{
+        evalMsg(m,prev);prev=m;agMsgs.push(m);agNames[m.ag]=1;
+        if(pend&&pend.d&&m.d){m.delay=(m.d-pend.d)/36e5;delays.push(m.delay)}
+        pend=null;
+        var a=ag[m.ag]=ag[m.ag]||{n:0,sum:0,f:{},dl:[],cs:{}};
+        a.n++;a.sum+=m.pct;a.cs[id]=1;if(m.delay!=null)a.dl.push(m.delay);
+        m.chk.forEach(function(x){if(!x.ok)a.f[x.k]=(a.f[x.k]||0)+1});
+      }
+    });
+    c.agents=Object.keys(agNames);c.delays=delays;
+    c.avgDelay=delays.length?delays.reduce(function(a,b){return a+b},0)/delays.length:null;
+    c.maxDelay=delays.length?Math.max.apply(null,delays):0;
+    c.pend=pend&&pend.d?{since:pend.d,dias:(rd-pend.d)/864e5}:null;
+    c.nAg=agMsgs.length;c.nCli=c.msgs.length-agMsgs.length;
+    var all=agMsgs.map(function(m){return m.txt}).join(' ');
+    c.med=/MEDICALAE|UNSAFPRD|ADVERSE/i.test(c.sub);
+    var alerts=[],ideas=[],cli=cliTxt.toLowerCase();
+    if(c.pend&&c.pend.dias>=1)alerts.push('El último mensaje es del cliente y lleva '+fdur(c.pend.dias*24)+' sin respuesta (desde '+fdate(c.pend.since)+'). Respóndele hoy.');
+    if(c.maxDelay>P().sla)alerts.push('Hubo respuestas tardías: la más lenta tardó '+fdur(c.maxDelay)+'. Si no puedes resolver, avisa al cliente que recibiste su mensaje y cuándo responderás.');
+    if(agMsgs.some(function(m){return m.dup}))alerts.push('Se envió un correo casi idéntico al anterior. Revisa el historial antes de responder para no repetir información.');
+    if(c.agents.length>=3)alerts.push('Pasaron '+c.agents.length+' agentes por el mismo caso. Deja notas de traspaso para que el cliente no repita su historia ni note cambios de criterio.');
+    if(c.med&&agMsgs.length&&!RX.sal.test(all))alerts.push('Es un caso de salud o seguridad del producto y ningún correo recomienda consultar a un profesional de la salud.');
+    if(c.med&&agMsgs.length&&!RX.seg.test(all))alerts.push('No se informa al cliente que su caso se escala al área de Seguridad del Producto.');
+    var docs=agMsgs.filter(function(m){return /factura|receta|fotograf|comprobante/i.test(m.txt)}).length;
+    if(docs>=3){alerts.push('Se pidieron documentos en '+docs+' correos distintos.');ideas.push('Reúne en una sola lista todo lo que necesitas (factura, receta, fotos, datos de pago) y pídelo en un único correo.')}
+    var neg=/empeor|queman|molest|impactad|amenaza|latoso|p[eé]sim|horrible|mal servicio|reclamo|no me han|sigo esperando/.test(cli);
+    if(neg)ideas.push('El cliente expresó malestar o que su situación empeora: prioriza el caso, haz seguimiento sin esperar a que te escriba y confirma cada avance.');
+    if(/dinero|muy caro|no tenemos|no puedo pagar|no me alcanza/.test(cli))ideas.push('El cliente mencionó limitaciones económicas: simplifica el trámite, explica con claridad los pasos y los plazos del reembolso, y evita pedirle gastos o trámites extra.');
+    if(/con qui[eé]n|qui[eé]n me atiende|con qui[eé]n tengo/.test(cli))ideas.push('Preguntó con quién habla: preséntate con tu nombre y rol desde el primer renglón.');
+    if(/gracias por (el|su|tu) apoyo|muchas gracias|agradezco/.test(cli))ideas.push('El cliente ya valora la atención: es el momento de cerrar bien, confirmarle qué se hizo y dejarle abierta la puerta para escribir.');
+    ideas.push('Antes de cerrar, resume en dos líneas qué se resolvió y qué sigue, y pregunta si hay algo más en lo que puedas ayudar.');
+    c.alerts=alerts;c.ideas=ideas;
+    var pts=(c.pend&&c.pend.dias>=3?2:0)+(c.maxDelay>P().sla*2?2:c.maxDelay>P().sla?1:0)+(neg?2:0)+(c.med&&alerts.some(function(x){return /profesional de la salud|Seguridad del Producto/.test(x)})?1:0)+(agMsgs.some(function(m){return m.dup})?1:0);
+    c.risk=pts>=3?'alto':pts>=1?'medio':'bajo';
+    c.mx=clasif(c,agMsgs,cli,docs,neg,all);
+    list.push(c);
+  });
+  return{cases:list,ag:ag,rd:rd};
+}
+
+function cls(p){return p>=80?'sc-a':p>=60?'sc-m':'sc-b'}
+function render(){
+  if(!D)return;
+  var fa=$a('fAg').value,fr=$a('fRi').value,all=[],dl=[],hi=0;
+  D.cases.forEach(function(c){all=all.concat(c.msgs.filter(function(m){return m.tipo==='agente'}));dl=dl.concat(c.delays);if(c.risk==='alto')hi++});
+  var avg=all.length?Math.round(all.reduce(function(a,m){return a+m.pct},0)/all.length):0;
+  $a('stats').innerHTML='<div class="kpi"><small>Casos</small><b>'+D.cases.length+'</b></div><div class="kpi"><small>Correos de agentes</small><b>'+all.length+'</b></div><div class="kpi"><small>Puntaje promedio</small><b class="'+cls(avg)+'">'+avg+'%</b></div><div class="kpi"><small>Respuesta promedio</small><b>'+(dl.length?fdur(dl.reduce(function(a,b){return a+b},0)/dl.length):'–')+'</b></div><div class="kpi"><small>Casos en riesgo alto</small><b class="'+(hi?'sc-b':'sc-a')+'">'+hi+'</b></div>';
+  var rows='<tr><th>Agente</th><th>Correos</th><th>Casos</th><th>Puntaje</th><th>Respuesta prom.</th><th>Qué reforzar</th></tr>';
+  Object.keys(D.ag).sort().forEach(function(n){
+    var a=D.ag[n],p=Math.round(a.sum/a.n),top=Object.keys(a.f).sort(function(x,y){return a.f[y]-a.f[x]}).slice(0,2).map(function(k){return NOM[k]}).join(', ');
+    rows+='<tr><td>'+esc(n)+'</td><td>'+a.n+'</td><td>'+Object.keys(a.cs).length+'</td><td class="'+cls(p)+'"><b>'+p+'%</b></td><td>'+(a.dl.length?fdur(a.dl.reduce(function(x,y){return x+y},0)/a.dl.length):'–')+'</td><td>'+esc(top||'Sin hallazgos')+'</td></tr>';
+  });
+  $a('tAg').innerHTML=rows;
+  var out='';
+  D.cases.forEach(function(c){
+    if(fr&&c.risk!==fr)return;
+    if(fa&&c.agents.indexOf(fa)<0)return;
+    var h='<details class="case"><summary><b>Caso '+esc(c.id)+'</b><span class="pill r-'+c.risk+'">Riesgo '+c.risk+'</span><span class="mu">'+esc([c.marca,c.pais].filter(Boolean).join(' · '))+' · '+c.nAg+' correos de agentes, '+c.nCli+' del cliente</span></summary><div class="cbody">';
+    h+='<p class="mu">'+esc(c.sku)+(c.sub?' · Motivos: '+esc(c.sub):'')+(c.agents.length?' · Agentes: '+esc(c.agents.join(', ')):'')+(c.avgDelay!=null?' · Respuesta promedio: '+fdur(c.avgDelay):'')+'</p>';
+    h+='<h4>Qué mejorar en este caso</h4>'+(c.alerts.length?'<ul>'+c.alerts.map(function(x){return'<li>'+esc(x)+'</li>'}).join('')+'</ul>':'<p class="mu">Sin alertas: buen manejo de tiempos y seguimiento.</p>');
+    h+=mxHtml(c);h+='<h4>Ideas para ganar un promotor</h4><ul>'+c.ideas.map(function(x){return'<li>'+esc(x)+'</li>'}).join('')+'</ul><h4>Correo por correo</h4>';
+    c.msgs.forEach(function(m){
+      if(m.tipo==='cliente'){h+='<div class="em cli"><div class="h"><span><b>Cliente</b> · '+fdate(m.d)+'</span></div><p class="mu" style="margin:4px 0 0">'+esc(m.txt.slice(0,220))+(m.txt.length>220?'…':'')+'</p></div>';return}
+      if(fa&&m.ag!==fa)return;
+      h+='<div class="em"><div class="h"><span><b>'+esc(m.ag)+'</b> · '+fdate(m.d)+(m.delay!=null?' · respondió en '+fdur(m.delay):'')+'</span><b class="'+cls(m.pct)+'">'+m.pct+'%</b></div><div class="chips">'+m.chk.map(function(x){return'<span class="chip '+(x.ok?'ok':'no')+'">'+(x.ok?'✓ ':'✗ ')+NOM[x.k]+'</span>'}).join('')+'</div>';
+      var f=m.chk.filter(function(x){return!x.ok});
+      if(f.length||m.dup||m.trunc){h+='<ul>'+f.map(function(x){return'<li>'+esc(TIP[x.k])+' <span class="mu">(Matriz: '+esc(MXL[x.k])+')</span></li>'}).join('')+(m.dup?'<li>Es casi igual al correo anterior del agente: evita repetir el mismo texto.</li>':'')+(m.trunc?'<li class="mu">El reporte corta este correo (~1.000 caracteres): revisa el texto completo en Salesforce.</li>':'')+'</ul>'}
+      else h+='<p class="mu" style="margin:0">Cumple todos los criterios.</p>';
+      h+='</div>';
+    });
+    out+=h+'</div></details>';
+  });
+  $a('cases').innerHTML=out||'<p class="mu">No hay casos con ese filtro.</p>';
+}
+
+function csv(){
+  if(!D)return;
+  var L=[['Caso','Agente','Fecha','Puntaje %','Criterios a mejorar','Tiempo de respuesta (h)','Causa raíz sugerida (caso)','Causas secundarias sugeridas (caso)']];
+  D.cases.forEach(function(c){c.msgs.forEach(function(m){if(m.tipo==='agente')L.push([c.id,m.ag,fdate(m.d),m.pct,m.chk.filter(function(x){return!x.ok}).map(function(x){return NOM[x.k]}).join('; '),m.delay!=null?Math.round(m.delay*10)/10:'',c.mx.raiz,c.mx.items.map(function(x){return QMX[x.id][2]}).join('; ')])})});
+  var t=L.map(function(r){return r.map(function(v){return'"'+s(v).replace(/"/g,'""')+'"'}).join(',')}).join('\r\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+t],{type:'text/csv;charset=utf-8'}));a.download='detalle-atencion-por-caso.csv';document.body.appendChild(a);a.click();a.remove();
+}
+
+function handle(f){
+  if(!f)return;
+  $a('msgA').textContent='Leyendo '+f.name+'…';
+  var r=new FileReader();
+  r.onload=function(e){
+    try{
+      if(typeof XLSX==='undefined')throw new Error('No cargó la librería para leer Excel. Revisa tu conexión a internet y recarga la página.');
+      var wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+      LAST=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:true,defval:''});D=analyze(LAST);
+      var sel='<option value="">Todos los agentes</option>'+Object.keys(D.ag).sort().map(function(n){return'<option>'+esc(n)+'</option>'}).join('');
+      $a('fAg').innerHTML=sel;$a('res').hidden=false;
+      $a('msgA').textContent='Listo: '+D.cases.length+' caso(s) analizados.';
+      render();
+    }catch(err){$a('msgA').textContent='⚠ '+err.message;$a('res').hidden=true}
+  };
+  r.readAsArrayBuffer(f);
+}
+$a('file').addEventListener('change',function(e){handle(e.target.files[0])});
+var dz=$a('drop');
+['dragenter','dragover'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.add('on')})});
+['dragleave','drop'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.remove('on')})});
+dz.addEventListener('drop',function(e){handle(e.dataTransfer.files[0])});
+$a('fAg').addEventListener('change',render);$a('fRi').addEventListener('change',render);$a('csv').addEventListener('click',csv);
+function tab(n){['vAn','vMx','vCalc'].forEach(function(id,i){$a(id).hidden=i!==n});['tA','tM','tB'].forEach(function(id,i){$a(id).setAttribute('aria-selected',i===n)})}
+$a('tA').addEventListener('click',function(){tab(0)});$a('tM').addEventListener('click',function(){tab(1)});$a('tB').addEventListener('click',function(){tab(2)});
+function re(){if(LAST){try{D=analyze(LAST);render()}catch(e){}}}
+$a('pSla').addEventListener('change',re);$a('pMail').addEventListener('change',re);
+buildMx();
+window.__analyze=analyze;window.__QM=QM;
+})();
+</script>
+<script>
+(function(){
+var $x=function(i){return document.getElementById(i)};
+function s(v){return v==null?'':String(v)}
+function esc(t){return s(t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+var KEY='ccc_nps_csat_fuentes_v3',L={sources:{GCCP:{cases:{}},Sprinklr:{cases:{}}}},cur='';
+var SPECIALISTS=['Valentina Delgado Pizo','Nikol Adriana Muñoz Muñoz','Jefry Joel Betancur Imbachil','Jhon Janer Ortiz Sanchez','Andres Eduardo Reina Rangel','Cristhian Ivan Buenaños Montaño','Anyi Lorena Cardenas Correa','Diana Marcela Melo Martinez','Luisa Fernanda Cifuentes Grajales','Heide Alexandra Diaz Londoño','Jerson Javier Ruiz Lopez','Kenneth Guillermo Rodriguez Gil'];
+function specialist(c){return s(c.assignedAg||c.ag).trim()}
+function specialistOptions(selected){return '<option value="">Seleccionar especialista…</option>'+SPECIALISTS.map(function(n){return '<option value="'+esc(n)+'"'+(selected===n?' selected':'')+'>'+esc(n)+'</option>'}).join('')}
+/* Las bases se mantienen solo en memoria durante esta sesión para evitar mezclar cargas antiguas entre usuarios o reportes. */
+try{localStorage.removeItem('ccc_nps_csat_fuentes_v2');localStorage.removeItem(KEY)}catch(e){}
+function save(){}
+function num(v){var m=/[-+]?\d+(?:[\.,]\d+)?/.exec(s(v));return m?parseFloat(m[0].replace(',','.')):null}
+function norm(v){return s(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
+function parseDate(v){
+  if(v instanceof Date&&!isNaN(v.getTime()))return v;
+  if(typeof v==='number'&&isFinite(v))return new Date(Math.round((v-25569)*86400000));
+  var z=s(v).trim(),m;
+  if(!z)return null;
+  m=/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/.exec(z);
+  if(m)return new Date(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0),+(m[6]||0));
+  m=/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/.exec(z);
+  if(m)return new Date(+m[3],+m[2]-1,+m[1],+(m[4]||0),+(m[5]||0),+(m[6]||0));
+  var d=new Date(z);return isNaN(d.getTime())?null:d;
+}
+function day(d){return d?d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2):''}
+function fday(d){if(!d)return'–';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function lab(h){return('0'+h).slice(-2)+':00'}
+function cCls(v){return v==null?'':v>=6?'P':'D'}
+function nCls(v){return v==null?'':v>=9?'P':v>=7?'N':'D'}
+function headerIndex(aoa,need){
+  for(var i=0;i<Math.min(aoa.length,30);i++){
+    var row=aoa[i].map(function(x){return s(x).trim()});
+    var ok=need.every(function(n){return row.indexOf(n)>=0});
+    if(ok)return{row:i,h:row};
+  }
+  return null;
+}
+function findCol(h,preds){for(var i=0;i<h.length;i++){var n=norm(h[i]);for(var j=0;j<preds.length;j++)if(preds[j](n,h[i]))return i}return-1}
+function parseGCCP(aoa){
+  var z=headerIndex(aoa,['Case Number','Question Name','Response']);
+  if(!z)throw new Error('GCCP: no encontré las columnas Case Number, Question Name y Response.');
+  var h=z.h,C={id:h.indexOf('Case Number'),q:h.indexOf('Question Name'),r:h.indexOf('Response'),ag:h.indexOf('Case Owner'),dt:h.indexOf('Date/Time Closed'),ver:h.indexOf('Verbatim (Local Language)'),brand:h.indexOf('Brand Name'),sku:h.indexOf('Product Description (SKU)'),country:h.indexOf('Consumer Country'),sub:h.indexOf('Subjects'),tipo:h.indexOf('Type of Communication')},map={};
+  for(var i=z.row+1;i<aoa.length;i++){
+    var row=aoa[i],id=s(row[C.id]).trim();if(!id)continue;
+    var d=parseDate(row[C.dt]);
+    if(!map[id])map[id]={id:id,source:'GCCP',ag:s(row[C.ag]),date:d,day:day(d),hora:d?d.getHours():null,csat:null,nps:null,ver:s(row[C.ver]),brand:s(row[C.brand]),sku:s(row[C.sku]),country:s(row[C.country]),sub:s(row[C.sub]),tipo:s(row[C.tipo]),attr:'',why:'',mx:''};
+    var c=map[id],q=norm(row[C.q]),v=num(row[C.r]);
+    if(/satisfech/.test(q)&&v!=null)c.csat=v;
+    if(/recomend|0 a 10/.test(q)&&v!=null)c.nps=v;
+    if(!c.ag&&C.ag>=0)c.ag=s(row[C.ag]);
+    if(!c.date&&d){c.date=d;c.day=day(d);c.hora=d.getHours()}
+  }
+  return Object.keys(map).map(function(k){return map[k]}).filter(function(c){return c.day})
+}
+function surveyScore(v){
+  if(v==null||v==='')return null;
+  var z=num(v);
+  return z!=null&&z>=1&&z<=10?z:null;
+}
+function parseSprinklr(aoa){
+  var z=headerIndex(aoa,['Case Id']);if(!z)throw new Error('Sprinklr: no encontré la columna Case Id.');
+  var h=z.h,C={id:h.indexOf('Case Id'),dt:findCol(h,[function(n){return /case creation time \(survey\)/.test(n)},function(n){return /creation time/.test(n)}]),cs:findCol(h,[function(n){return /satisfaction survey.*please rate|satisfaction.*rate/.test(n)&&!/not that satisfied/.test(n)}]),np:findCol(h,[function(n){return /based on your recent experience.*likely|how likely would you be/.test(n)},function(n){return /recommend/.test(n)}]),ag:findCol(h,[function(n){return /case owner|owner|agent|specialist|assignee/.test(n)}]),brand:findCol(h,[function(n){return /brand \(case\)/.test(n)}]),country:findCol(h,[function(n){return /country/.test(n)}]),sku:findCol(h,[function(n){return /product code/.test(n)}]),sub:findCol(h,[function(n){return /subject code/.test(n)}]),tipo:findCol(h,[function(n){return /case type/.test(n)}])};
+  if(C.dt<0)throw new Error('Sprinklr: no encontré Case Creation Time (Survey).');
+  var map={};
+  for(var i=z.row+1;i<aoa.length;i++){
+    var row=aoa[i],id=s(row[C.id]).trim();if(!id)continue;
+    var d=parseDate(row[C.dt]),c=map[id];
+    if(!c)c=map[id]={id:id,source:'Sprinklr',ag:C.ag>=0?s(row[C.ag]):'',date:d,day:day(d),hora:d?d.getHours():null,csat:C.cs>=0?surveyScore(row[C.cs]):null,nps:C.np>=0?surveyScore(row[C.np]):null,ver:'',brand:C.brand>=0?s(row[C.brand]):'',sku:C.sku>=0?s(row[C.sku]):'',country:C.country>=0?s(row[C.country]):'',sub:C.sub>=0?s(row[C.sub]):'',tipo:C.tipo>=0?s(row[C.tipo]):'',attr:'',why:'',mx:''};
+    else{if(c.csat==null&&C.cs>=0)c.csat=surveyScore(row[C.cs]);if(c.nps==null&&C.np>=0)c.nps=surveyScore(row[C.np]);}
+  }
+  return Object.keys(map).map(function(k){return map[k]}).filter(function(c){return c.day})
+}
+function put(source,list){
+  /* Cada carga reemplaza por completo esa fuente; nunca se agregan registros de archivos anteriores. */
+  var previous=L.sources[source].cases||{}, fresh={};
+  list.forEach(function(c){
+    var old=previous[c.id];
+    if(old){c.attr=old.attr||'';c.why=old.why||'';c.mx=old.mx||'';c.assignedAg=old.assignedAg||''}
+    fresh[c.id]=c;
+  });
+  L.sources[source].cases=fresh;
+  save();
+}
+function allCases(source){return Object.keys(L.sources[source].cases).map(function(k){return L.sources[source].cases[k]}).filter(function(c){return !!c.day})}
+function allCurrent(){return allCases('GCCP').concat(allCases('Sprinklr'))}
+function sourceDays(source){var days=[];Object.keys(L.sources[source].cases).forEach(function(k){var d=L.sources[source].cases[k].day;if(d&&days.indexOf(d)<0)days.push(d)});days.sort();return days}
+function dateLabel(source){var days=sourceDays(source);if(!days.length)return'–';if(days.length===1)return fday(days[0]);return fday(days[0])+' – '+fday(days[days.length-1])}
+function refreshDay(){var days=[];['GCCP','Sprinklr'].forEach(function(src){sourceDays(src).forEach(function(d){if(days.indexOf(d)<0)days.push(d)})});days.sort();cur=days.length?(days.length===1?days[0]:days[0]+'_'+days[days.length-1]):'';return days}
+function calc(list){
+  var r={cp:0,cd:0,np:0,nn:0,nd:0,ct:0,nt:0,csatResponses:0,npsResponses:0,cases:list.length};
+  list.forEach(function(c){
+    var a=cCls(c.csat),b=nCls(c.nps);
+    if(a==='P'){r.cp++;r.csatResponses++}else if(a==='D'){r.cd++;r.csatResponses++}
+    if(b==='P'){r.np++;r.npsResponses++}else if(b==='N'){r.nn++;r.npsResponses++}else if(b==='D'){r.nd++;r.npsResponses++}
+  });
+  r.ct=r.csatResponses;r.nt=r.npsResponses;
+  r.csat=r.ct?Math.round(r.cp/r.ct*100):null;
+  r.nps=r.nt?Math.round((r.np-r.nd)/r.nt*100):null;
+  r.pp=r.nt?Math.round(r.np/r.nt*100):null;
+  return r;
+}
+function pc(v){return v==null?'–':v+'%'}
+function hourRows(list){var out=[];for(var h=0;h<24;h++){var l=list.filter(function(c){return c.hora===h}),r=calc(l);out.push({h:h,l:l,r:r})}return out}
+function sourceTable(){
+  var gList=allCases('GCCP'),sList=allCases('Sprinklr'),all=allCurrent();
+  var g=calc(gList),s2=calc(sList),t=calc(all);
+  var rows=[['GCCP',gList.length,g.nps,g.npsResponses,g.np,g.nn,g.nd,g.csat,g.csatResponses,g.cp,g.cd],
+            ['Sprinklr',sList.length,s2.nps,s2.npsResponses,s2.np,s2.nn,s2.nd,s2.csat,s2.csatResponses,s2.cp,s2.cd],
+            ['Consolidado',all.length,t.nps,t.npsResponses,t.np,t.nn,t.nd,t.csat,t.csatResponses,t.cp,t.cd]];
+  $x('xSrc').innerHTML='<tr><th>Fuente</th><th>Casos únicos</th><th>NPS</th><th>Encuestas NPS</th><th>NPS prom.</th><th>NPS neut.</th><th>NPS detr.</th><th>CSAT</th><th>Encuestas CSAT</th><th>CSAT satisfechos</th><th>CSAT insatisfechos</th></tr>'+rows.map(function(r){return'<tr><td><b>'+r[0]+'</b></td><td>'+r[1]+'</td><td>'+pc(r[2])+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5]+'</td><td>'+r[6]+'</td><td>'+pc(r[7])+'</td><td>'+r[8]+'</td><td>'+r[9]+'</td><td>'+r[10]+'</td></tr>'}).join('');
+  return t;
+}
+function hasAnySource(){
+  return Object.keys(L.sources.GCCP.cases).length>0 || Object.keys(L.sources.Sprinklr.cases).length>0;
+}
+var HIST_KEY='ccc_agent_streak_history_v1';
+function readAgentHistory(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'{}')||{}}catch(e){return{}}}
+function saveAgentHistory(h){try{localStorage.setItem(HIST_KEY,JSON.stringify(h))}catch(e){}}
+function recordAgentHistory(){
+  var h=readAgentHistory(),groups={},list=allCurrent();
+  list.forEach(function(c){
+    var agent=specialist(c);if(!agent||!c.day)return;
+    var key=agent+'|'+c.day;
+    if(!groups[key])groups[key]={agent:agent,day:c.day,cases:[]};
+    groups[key].cases.push(c);
+  });
+  Object.keys(groups).forEach(function(key){
+    var g=groups[key],r=calc(g.cases);
+    h[key]={agent:g.agent,day:g.day,cases:g.cases.length,nps:r.nps,csat:r.csat,npsResponses:r.npsResponses,csatResponses:r.csatResponses};
+  });
+  saveAgentHistory(h);
+  return h;
+}
+function streakLength(records,metric){
+  var n=0,expected=null;
+  for(var i=records.length-1;i>=0;i--){
+    var d=parseDate(records[i].day+'T00:00:00');
+    if(!d)continue;
+    if(expected!==null){
+      var prev=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1);
+      if(day(prev)!==expected)break;
+    }
+    var good=metric==='NPS'?(records[i].nps!=null&&records[i].nps>0):(records[i].csat!=null&&records[i].csat>=80);
+    if(!good)break;
+    n++;expected=records[i].day;
+  }
+  return n;
+}
+function renderAgentHistory(){
+  var h=readAgentHistory(),by={};
+  Object.keys(h).forEach(function(k){var r=h[k];if(!r.agent)return;(by[r.agent]=by[r.agent]||[]).push(r)});
+  var rows=[],congrats=[];
+  Object.keys(by).sort().forEach(function(agent){
+    var records=by[agent].sort(function(a,b){return a.day.localeCompare(b.day)});
+    var npsStreak=streakLength(records,'NPS'),csatStreak=streakLength(records,'CSAT');
+    var latest=records[records.length-1];
+    rows.push('<tr><td><b>'+esc(agent)+'</b></td><td>'+fday(latest.day)+'</td><td>'+latest.cases+'</td><td>'+pc(latest.nps)+'</td><td>'+pc(latest.csat)+'</td><td><b>'+npsStreak+'</b> día(s)</td><td><b>'+csatStreak+'</b> día(s)</td></tr>');
+    [ ['NPS',npsStreak],['CSAT',csatStreak] ].forEach(function(x){
+      if(x[1]>=3 && (x[1]===3||x[1]===5||x[1]===7||x[1]%10===0)){
+        congrats.push('🎉 ¡Felicitaciones, '+esc(agent)+'! Lleva '+x[1]+' días consecutivos con '+x[0]+' '+(x[0]==='NPS'?'positivo':'de 80% o más')+'.');
+      }
+    });
+  });
+  $x('xHist').innerHTML='<tr><th>Especialista</th><th>Último reporte</th><th>Casos</th><th>NPS último día</th><th>CSAT último día</th><th>Racha NPS</th><th>Racha CSAT</th></tr>'+(rows.join('')||'<tr><td colspan="7" class="mu">El histórico aparecerá cuando cargues reportes con especialista y fecha.</td></tr>');
+  $x('xCongrats').innerHTML=congrats.length?congrats.map(function(t){return'<div class="kpi" style="margin:6px 0"><span>'+t+'</span></div>'}).join(''):'Aún no hay una racha que alcance el hito de felicitación. El histórico se guarda en este navegador.';
+}
+function clearAgentHistory(){
+  if(!confirm('¿Borrar permanentemente el histórico de rachas guardado en este navegador?'))return;
+  try{localStorage.removeItem(HIST_KEY)}catch(e){}
+  renderAgentHistory();
+}
+function render(){
+  var gList=allCases('GCCP'),sList=allCases('Sprinklr'),list=gList.concat(sList);
+  if(!hasAnySource() || !list.length){
+    $x('xOut').hidden=true;$x('xDay').textContent='–';
+    $x('xMsg').textContent='Carga GCCP, Sprinklr o ambas. El cálculo utilizará todas las bases que hayas cargado, sin exigir que estén las dos.';
+    return;
+  }
+  $x('xOut').hidden=false;$x('xDay').textContent='GCCP: '+dateLabel('GCCP')+' · Sprinklr: '+dateLabel('Sprinklr');var t=sourceTable();
+  function k(n,v,sm){return'<div class="kpi"><small>'+n+'</small><b>'+v+'</b><span class="sm">'+sm+'</span></div>'}
+  $x('xSt').innerHTML=k('NPS consolidado',t.nps==null?'–':(t.nps>0?'+':'')+t.nps,t.np+' promotores · '+t.nn+' neutros · '+t.nd+' detractores')+k('CSAT consolidado',pc(t.csat),t.cp+' satisfechos · '+t.cd+' insatisfechos')+k('Casos únicos',list.length,'GCCP '+allCases('GCCP').length+' · Sprinklr '+allCases('Sprinklr').length);
+  var hr='<tr><th>Hora</th><th>GCCP casos</th><th>Sprinklr casos</th><th>Casos total</th><th>NPS</th><th>Encuestas NPS</th><th>NPS prom.</th><th>NPS neut.</th><th>NPS detr.</th><th>CSAT</th><th>Encuestas CSAT</th><th>CSAT satisfechos</th><th>CSAT insatisfechos</th></tr>';
+  hourRows(list).forEach(function(x){var g=x.l.filter(function(c){return c.source==='GCCP'}).length,sp=x.l.filter(function(c){return c.source==='Sprinklr'}).length;hr+='<tr><td><b>'+lab(x.h)+'</b></td><td>'+g+'</td><td>'+sp+'</td><td>'+x.l.length+'</td><td>'+pc(x.r.nps)+'</td><td>'+x.r.npsResponses+'</td><td>'+x.r.np+'</td><td>'+x.r.nn+'</td><td>'+x.r.nd+'</td><td>'+pc(x.r.csat)+'</td><td>'+x.r.csatResponses+'</td><td>'+x.r.cp+'</td><td>'+x.r.cd+'</td></tr>'});
+  $x('xHr').innerHTML=hr;
+  var groups={},unassigned=[];
+  list.forEach(function(c){
+    var name=specialist(c);
+    if(name){groups[name]=groups[name]||[];groups[name].push(c)}else unassigned.push(c);
+  });
+  var sh='<tr><th>Especialista / caso</th><th>Fuente(s)</th><th>Casos únicos</th><th>NPS</th><th>Encuestas NPS</th><th>NPS prom.</th><th>NPS neut.</th><th>NPS detr.</th><th>CSAT</th><th>Encuestas CSAT</th><th>CSAT satisfechos</th><th>CSAT insatisfechos</th></tr>';
+  Object.keys(groups).sort().forEach(function(a){
+    var records=groups[a],r=calc(records),sources=[];
+    records.forEach(function(c){if(sources.indexOf(c.source)<0)sources.push(c.source)});
+    sh+='<tr><td><b>'+esc(a)+'</b></td><td>'+sources.join(' + ')+'</td><td>'+records.length+'</td><td>'+pc(r.nps)+'</td><td>'+r.npsResponses+'</td><td>'+r.np+'</td><td>'+r.nn+'</td><td>'+r.nd+'</td><td>'+pc(r.csat)+'</td><td>'+r.csatResponses+'</td><td>'+r.cp+'</td><td>'+r.cd+'</td></tr>';
+  });
+  unassigned.forEach(function(c){var r=calc([c]);sh+='<tr data-assign-src="'+esc(c.source)+'" data-assign-id="'+esc(c.id)+'"><td><select data-f="specialist">'+specialistOptions('')+'</select><div class="mu">Caso '+esc(c.id)+'</div></td><td>'+esc(c.source)+'</td><td>1</td><td>'+pc(r.nps)+'</td><td>'+r.npsResponses+'</td><td>'+r.np+'</td><td>'+r.nn+'</td><td>'+r.nd+'</td><td>'+pc(r.csat)+'</td><td>'+r.csatResponses+'</td><td>'+r.cp+'</td><td>'+r.cd+'</td></tr>'});
+  if(!list.length)sh+='<tr><td colspan="12" class="mu">No hay datos cargados.</td></tr>';
+  $x('xSp').innerHTML=sh;
+  var det=list.filter(function(c){return cCls(c.csat)==='D'||nCls(c.nps)==='D'}),pending=det.filter(function(c){return !c.attr}).length,yes=det.filter(function(c){return c.attr==='si'}).length,no=det.filter(function(c){return c.attr==='no'}).length;
+  $x('xRes').textContent='Detractores revisables: '+det.length+' · Atribuibles: '+yes+' · No atribuibles: '+no+' · Pendientes: '+pending;
+  var dh='<tr><th>Fuente</th><th>Caso</th><th>Especialista</th><th>Hora</th><th>CSAT</th><th>NPS</th><th>¿Atribuible?</th><th>Motivo</th></tr>';
+  det.forEach(function(c){dh+='<tr data-src="'+esc(c.source)+'" data-id="'+esc(c.id)+'"><td>'+c.source+'</td><td><b>'+esc(c.id)+'</b></td><td>'+esc(c.ag||'—')+'</td><td>'+lab(c.hora)+'</td><td>'+esc(c.csat==null?'—':c.csat)+'</td><td>'+esc(c.nps==null?'—':c.nps)+'</td><td><select data-f="attr"><option value=""'+(!c.attr?' selected':'')+'>Pendiente</option><option value="si"'+(c.attr==='si'?' selected':'')+'>Atribuible</option><option value="no"'+(c.attr==='no'?' selected':'')+'>No atribuible</option></select></td><td>'+(c.attr==='si'?'<input data-f="why" placeholder="¿Por qué es atribuible? (obligatorio)" value="'+esc(c.why||'')+'">':c.attr==='no'?'<span class="mu">Categorizado como no atribuible</span>':'<span class="mu">Selecciona una clasificación</span>')+'</td></tr>'});
+  $x('xDt').innerHTML=dh;
+  recordAgentHistory();renderAgentHistory();
+}
+function updateState(msg){
+  var g=Object.keys(L.sources.GCCP.cases).length,s=Object.keys(L.sources.Sprinklr.cases).length;
+  var loaded=[];
+  if(g)loaded.push('GCCP ✓');
+  if(s)loaded.push('Sprinklr ✓');
+  $x('xState').textContent=loaded.length?loaded.join(' + '):'Esperando archivos';
+  $x('xStateSm').textContent='GCCP: '+g+' casos · Sprinklr: '+s+' casos · Se calcula con cualquier fuente cargada';
+  $x('xMsg').textContent=msg||(loaded.length?'Cálculo actualizado con '+loaded.join(' y ')+'. Las encuestas NPS y CSAT se cuentan por separado.':'Carga GCCP, Sprinklr o ambas; ninguna es obligatoria por separado.');
+}
+function loadFile(file,source){if(!file)return;$x('xMsg').textContent='Leyendo '+source+'…';var r=new FileReader();r.onload=function(e){try{if(typeof XLSX==='undefined')throw new Error('No cargó la librería de Excel. Revisa tu conexión y recarga.');var wb=XLSX.read(e.target.result,{type:'array',cellDates:true});var aoa=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:true,defval:''});var list=source==='GCCP'?parseGCCP(aoa):parseSprinklr(aoa);put(source,list);refreshDay();render();updateState(source+' cargado: '+list.length+' casos únicos. Fecha(s): '+dateLabel(source)+'. NPS y CSAT tienen conteos independientes.');}catch(err){$x('xMsg').textContent='⚠ '+err.message}e.target.value=''};r.readAsArrayBuffer(file)}
+function exportar(){
+  if(typeof XLSX==='undefined'){alert('No cargó la librería de Excel.');return}if(!hasAnySource()){alert('Carga al menos una base (GCCP o Sprinklr) para exportar.');return}var list=allCurrent();if(!list.length){alert('No hay registros para la fecha detectada.');return}
+  var det=list.filter(function(c){return cCls(c.csat)==='D'||nCls(c.nps)==='D'}),missing=det.filter(function(c){return c.attr==='si'&&!String(c.why||'').trim()}).length;if(missing){alert('Hay '+missing+' detractor(es) marcados como atribuibles sin explicación.');return}
+  var g=calc(allCases('GCCP')),sp=calc(allCases('Sprinklr')),t=calc(list);
+  var res=[['Reporte NPS y CSAT — GCCP + Sprinklr'],['Fechas detectadas','GCCP: '+dateLabel('GCCP'),'Sprinklr: '+dateLabel('Sprinklr')],[],['Fuente','Casos únicos','NPS','Encuestas NPS','NPS promotores','NPS neutros','NPS detractores','CSAT','Encuestas CSAT','CSAT satisfechos','CSAT insatisfechos'],['GCCP',allCases('GCCP').length,g.nps,g.npsResponses,g.np,g.nn,g.nd,g.csat,g.csatResponses,g.cp,g.cd],['Sprinklr',allCases('Sprinklr').length,sp.nps,sp.npsResponses,sp.np,sp.nn,sp.nd,sp.csat,sp.csatResponses,sp.cp,sp.cd],['Consolidado',list.length,t.nps,t.npsResponses,t.np,t.nn,t.nd,t.csat,t.csatResponses,t.cp,t.cd]];
+  var hr=[['Hora','GCCP casos','Sprinklr casos','Casos total','NPS','Encuestas NPS','NPS promotores','NPS neutros','NPS detractores','CSAT','Encuestas CSAT','CSAT satisfechos','CSAT insatisfechos']];hourRows(list).forEach(function(x){var gg=x.l.filter(function(c){return c.source==='GCCP'}).length,ss=x.l.filter(function(c){return c.source==='Sprinklr'}).length;hr.push([lab(x.h),gg,ss,x.l.length,x.r.nps,x.r.npsResponses,x.r.np,x.r.nn,x.r.nd,x.r.csat,x.r.csatResponses,x.r.cp,x.r.cd])});
+  var groups={};list.forEach(function(c){var a=specialist(c);if(a){var k=a+'|'+c.source;groups[k]=groups[k]||[];groups[k].push(c)}});var sr=[['Especialista','Fuente','Casos únicos','NPS','Encuestas NPS','NPS promotores','NPS neutros','NPS detractores','CSAT','Encuestas CSAT','CSAT satisfechos','CSAT insatisfechos']];Object.keys(groups).sort().forEach(function(k){var a=groups[k],r=calc(a),p=k.split('|');sr.push([p[0],p[1],a.length,r.nps,r.npsResponses,r.np,r.nn,r.nd,r.csat,r.csatResponses,r.cp,r.cd])});
+  var ar=[['Fuente','Caso','Especialista','Hora','CSAT','NPS','Atribuible','Motivo']];det.forEach(function(c){ar.push([c.source,c.id,specialist(c),lab(c.hora),c.csat,c.nps,c.attr==='si'?'Atribuible':c.attr==='no'?'No atribuible':'Pendiente',c.attr==='si'?c.why:''])});
+  var dd=[['Fuente','Caso','Fecha','Hora','Especialista','CSAT','Clasificación CSAT','NPS','Clasificación NPS','Marca','Producto','País']];list.forEach(function(c){dd.push([c.source,c.id,fday(c.day),lab(c.hora),specialist(c),c.csat,cCls(c.csat)==='P'?'Satisfecho':cCls(c.csat)==='D'?'Insatisfecho':'',c.nps,nCls(c.nps)==='P'?'Promotor':nCls(c.nps)==='N'?'Neutro':nCls(c.nps)==='D'?'Detractor':'',c.brand,c.sku,c.country])});
+  var wb=XLSX.utils.book_new();[['Resumen',res],['Corte por hora',hr],['Por especialista',sr],['Atribución',ar],['Detalle',dd],['Historico rachas',[['Especialista','Fecha','Casos','NPS','CSAT','Encuestas NPS','Encuestas CSAT']].concat(Object.keys(readAgentHistory()).map(function(k){var v=readAgentHistory()[k];return[v.agent,fday(v.day),v.cases,v.nps,v.csat,v.npsResponses,v.csatResponses]}))]].forEach(function(x){var ws=XLSX.utils.aoa_to_sheet(x[1]);XLSX.utils.book_append_sheet(wb,ws,x[0])});XLSX.writeFile(wb,'NPS-CSAT-GCCP-Sprinklr-'+(cur||'reporte')+'.xlsx');
+}
+$x('xFileG').addEventListener('change',function(e){loadFile(e.target.files[0],'GCCP')});
+$x('xFileS').addEventListener('change',function(e){loadFile(e.target.files[0],'Sprinklr')});
+$x('xThr').addEventListener('change',render);
+$x('xExp').addEventListener('click',exportar);
+function resetBases(){
+  if(!confirm('¿Seguro que quieres borrar GCCP, Sprinklr, atribuciones y resultados guardados en este navegador?'))return;
+  L={sources:{GCCP:{cases:{}},Sprinklr:{cases:{}}}};cur='';save();
+  $x('xFileG').value='';$x('xFileS').value='';
+  $x('xOut').hidden=true;$x('xDay').textContent='–';
+  updateState('Datos de GCCP y Sprinklr eliminados. Ahora puedes cargar las dos bases nuevamente.');
+}
+$x('xReset').addEventListener('click',resetBases);
+$x('xHistReset').addEventListener('click',clearAgentHistory);
+$x('xClr').addEventListener('click',resetBases);
+$x('xSp').addEventListener('change',function(e){var t=e.target;if(t.getAttribute('data-f')!=='specialist')return;var tr=t.closest('tr'),src=tr.getAttribute('data-assign-src'),id=tr.getAttribute('data-assign-id'),c=L.sources[src]&&L.sources[src].cases[id];if(!c)return;if(!t.value){c.assignedAg=''}else{c.assignedAg=t.value}save();render()});
+$x('xDt').addEventListener('change',function(e){var t=e.target;if(t.getAttribute('data-f')!=='attr')return;var tr=t.closest('tr'),src=tr.getAttribute('data-src'),id=tr.getAttribute('data-id'),c=L.sources[src].cases[id];c.attr=t.value;if(c.attr!=='si'){c.why='';c.mx=''}save();render()});
+$x('xDt').addEventListener('input',function(e){var t=e.target;if(t.getAttribute('data-f')!=='why')return;var tr=t.closest('tr'),src=tr.getAttribute('data-src'),id=tr.getAttribute('data-id'),c=L.sources[src].cases[id];c.why=t.value;save()});
+refreshDay();render();renderAgentHistory();updateState();
+window.__x={calc:calc,parseGCCP:parseGCCP,parseSprinklr:parseSprinklr,allCurrent:allCurrent};
+})();
+</script>
+</body>
+</html>
