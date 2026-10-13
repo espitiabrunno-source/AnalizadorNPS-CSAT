@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCC Coach | NPS & CSAT V1</title>
+<style>
+:root{
+  --bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#667085;--primary:#3157d5;
+  --primary2:#2445b8;--green:#159447;--yellow:#d99a00;--red:#d9363e;--border:#e4e8f0;
+  --shadow:0 8px 28px rgba(24,39,75,.08);--radius:18px;
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{display:flex;min-height:100vh}.sidebar{width:250px;background:#101a35;color:#fff;padding:24px 16px;position:fixed;inset:0 auto 0 0;z-index:5}
+.brand{font-size:21px;font-weight:800;padding:8px 10px 28px}.brand span{color:#91a8ff}
+.nav button{width:100%;background:transparent;border:0;color:#c9d1e5;text-align:left;padding:13px 14px;border-radius:11px;margin:3px 0}
+.nav button:hover,.nav button.active{background:#24335e;color:#fff}
+.main{margin-left:250px;width:calc(100% - 250px);padding:28px;max-width:1550px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}
+h1{font-size:28px;margin:0 0 6px}.subtitle{color:var(--muted)}
+.agent{background:var(--card);border:1px solid var(--border);padding:10px 14px;border-radius:12px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.metric .label{color:var(--muted);font-size:13px}.metric .value{font-size:34px;font-weight:800;margin:8px 0}.metric small{color:var(--muted)}
+.green{color:var(--green)}.yellow{color:var(--yellow)}.red{color:var(--red)}
+.section{margin-top:20px}.section-title{font-size:19px;font-weight:750;margin:0 0 14px}.two{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+form{display:grid;gap:14px}label{font-size:13px;font-weight:700;margin-bottom:5px;display:block}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid #d9deea;border-radius:10px;background:#fff;color:var(--text);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(49,87,213,.1)}textarea{min-height:100px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:750}.primary{background:var(--primary);color:#fff}.primary:hover{background:var(--primary2)}
+.secondary{background:#eef2ff;color:var(--primary)}.ghost{background:#f4f5f7;color:#344054}.danger{background:#fff0f1;color:var(--red)}
+.result{padding:16px;border-radius:12px;background:#f7f9fc;border:1px solid var(--border)}.big{font-size:42px;font-weight:850}
+.bar{height:10px;background:#edf0f5;border-radius:99px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;border-radius:99px;background:var(--primary)}
+.hidden{display:none!important}.badge{display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:750;background:#edf1ff;color:var(--primary)}
+.feedback{border-left:4px solid var(--primary);padding:14px;background:#f8f9fc;border-radius:0 12px 12px 0;margin:10px 0}
+.feedback strong{display:block;margin-bottom:5px}ul{padding-left:20px}li{margin:8px 0}.tip{background:#fff8e6;border:1px solid #f4dfa4;padding:13px;border-radius:12px}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:14px}.table th,.table td{text-align:left;padding:11px;border-bottom:1px solid var(--border);white-space:nowrap}
+.kpi-line{display:flex;justify-content:space-between;margin:10px 0;font-size:14px}.note{font-size:12px;color:var(--muted);line-height:1.5}
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.score-box{padding:14px;border:1px solid var(--border);border-radius:12px;background:#fbfcfe}.score-box input{font-size:20px;font-weight:700}
+.calc-result{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.mini{padding:16px;border:1px solid var(--border);border-radius:12px;background:#fff}
+.upload{border:2px dashed #cbd3e2;padding:20px;border-radius:14px;text-align:center;background:#fbfcff}.upload input{max-width:100%;padding:10px}
+.progress{height:8px;background:#e9edf4;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:var(--primary)}
+.footer{text-align:center;color:#98a2b3;padding:28px}
+.hourly-table td,.hourly-table th{white-space:nowrap}
+.hourly-table input,.hourly-table select{min-width:130px}
+.attrib-row{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+.case-table td{vertical-align:top;white-space:normal;min-width:120px}
+.case-table textarea{min-height:70px}
+.case-table select{min-width:145px}
+.status-pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}
+.status-attr{background:#eaf7ee;color:#137a39}.status-noattr{background:#f1f3f5;color:#475467}.status-pending{background:#fff5d9;color:#8a5b00}
+@media(max-width:1050px){.attrib-row{grid-template-columns:1fr}}
+
+@media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.two,.three,.calc-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.sidebar{width:68px;padding:16px 8px}.brand{font-size:0}.brand:after{content:"CCC";font-size:18px}.nav button{font-size:0;text-align:center}.nav button:before{content:"•";font-size:22px}.main{margin-left:68px;width:calc(100% - 68px);padding:18px}.grid,.score-grid,.calc-result{grid-template-columns:1fr}.row{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand">CCC <span>Coach</span></div>
+  <nav class="nav">
+    <button class="active" data-page="dashboard">📊 Dashboard</button>
+    <button data-page="calculator">🧮 Calculadora NPS / CSAT</button>
+    <button data-page="nps">⭐ Mi NPS</button>
+    <button data-page="csat">😊 Mi CSAT</button>
+    <button data-page="coach">🎯 Coach de atención</button>
+    <button data-page="consumer">💬 Manejo del consumidor</button>
+    <button data-page="history">📝 Mis registros</button>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div><h1 id="pageTitle">Mi desempeño</h1><div class="subtitle">CCC Coach · NPS, CSAT y coaching orientado a experiencia positiva.</div></div>
+    <div class="agent">Agente: <strong id="agentNameTop">Mi nombre</strong></div>
+  </div>
+
+  <section id="dashboard" class="page">
+    <div class="card" style="margin-bottom:18px">
+      <div class="row">
+        <div><label>Nombre del agente</label><input id="agentName" placeholder="Escribe tu nombre"></div>
+        <div><label>Meta NPS</label><input id="npsGoal" type="number" value="70" min="-100" max="100"></div>
+      </div>
+      <div style="margin-top:12px"><button class="btn primary" id="saveProfileBtn">Guardar perfil</button></div>
+    </div>
+    <div class="grid">
+      <div class="card metric"><div class="label">NPS</div><div id="dashNps" class="value">0</div><small id="npsStatus">Sin registros</small></div>
+      <div class="card metric"><div class="label">CSAT</div><div id="dashCsat" class="value">0%</div><small id="csatStatus">Sin registros</small></div>
+      <div class="card metric"><div class="label">Promotores</div><div id="dashPromoters" class="value green">0</div><small>Encuestas 9–10</small></div>
+      <div class="card metric"><div class="label">Efectividad Coach</div><div id="dashCoach" class="value">0%</div><small>Feedback marcado como efectivo</small></div>
+    </div>
+    <div class="two section">
+      <div class="card"><div class="section-title">Tu foco de mejora</div><div id="focusBox" class="result">Registra interacciones para recibir recomendaciones personalizadas.</div></div>
+      <div class="card"><div class="section-title">Regla de oro del CCC</div><div class="tip"><strong>Escucha → Valida → Resuelve → Confirma → Cierra.</strong><br><br>Una solución correcta + empatía + claridad + cierre puede generar una experiencia con mayor potencial de promotor.</div></div>
+    </div>
+  </section>
+
+  <section id="calculator" class="page hidden">
+    <div class="card">
+      <div class="section-title">🧮 Calculadora de NPS y CSAT</div>
+      <p class="subtitle">Calcula los indicadores manualmente o carga la exportación de la plataforma para obtener el resultado, un corte por hora y la revisión de atribución.</p>
+
+      <div class="calc-grid">
+        <div class="card" style="box-shadow:none">
+          <div class="section-title">NPS</div>
+          <div class="score-grid">
+            <div class="score-box"><label>Promotores 9–10</label><input id="calcP" type="number" min="0" value="0"></div>
+            <div class="score-box"><label>Neutrales 7–8</label><input id="calcPa" type="number" min="0" value="0"></div>
+            <div class="score-box"><label>Detractores 0–6</label><input id="calcD" type="number" min="0" value="0"></div>
+          </div>
+          <div style="margin-top:12px"><button class="btn primary" id="calcNpsBtn">Calcular NPS</button></div>
+          <div id="calcNpsOut" class="result" style="margin-top:12px">Ingresa las cantidades para calcular.</div>
+        </div>
+
+        <div class="card" style="box-shadow:none">
+          <div class="section-title">CSAT</div>
+          <div class="row">
+            <div><label>Respuestas satisfactorias</label><input id="calcSat" type="number" min="0" value="0"></div>
+            <div><label>Total respuestas CSAT</label><input id="calcTotal" type="number" min="0" value="0"></div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <div><label>Escala CSAT</label><select id="csatScale"><option value="1-7">1–7</option><option value="1-5">1–5</option><option value="1-10">1–10</option></select></div>
+            <div><label>Criterio satisfactorio</label><select id="csatRule"><option value="top2">Top 2</option><option value="topbox">Top Box</option><option value="manual">Cantidad manual</option></select></div>
+          </div>
+          <div style="margin-top:12px"><button class="btn primary" id="calcCsatBtn">Calcular CSAT</button></div>
+          <div id="calcCsatOut" class="result" style="margin-top:12px">Ingresa las cantidades para calcular.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">📥 Cargar Excel de la plataforma</div>
+        <div class="upload">
+          <strong>Sube una o ambas bases; no es obligatorio cargar las dos</strong>
+          <p class="note">Carga GCCP, Sprinklr o ambas. Si cargas las dos, la herramienta consolida sus respuestas; si solo cargas una, calcula con esa base. Para GCCP, el corte horario usa la columna O “Created Date” y selecciona por defecto el día más reciente disponible (idealmente hoy).</p>
+          <div class="row" style="margin-top:12px">
+            <div><label>Base GCCP</label><input id="gccpFile" type="file" accept=".xlsx,.xls,.csv"></div>
+            <div><label>Base Sprinklr</label><input id="sprinklrFile" type="file" accept=".xlsx,.xls,.csv"></div>
+          </div>
+          <div id="excelStatus" class="note" style="margin-top:10px">Puedes cargar solo una base o las dos.</div>
+        </div>
+      </div>
+
+      <div id="autoResult" class="result hidden" style="margin-top:16px"></div>
+
+      <div id="hourlyReview" class="hidden section">
+        <div class="attrib-row">
+          <div class="card" style="box-shadow:none">
+            <div class="section-title">🕐 Corte por hora</div>
+            <p class="note">El corte se calcula usando el campo de fecha/hora seleccionado. Puedes cambiarlo después de cargar el archivo.</p>
+            <div class="row">
+              <div><label>Campo de fecha/hora</label><select id="timeField"></select></div>
+              <div><label>Fecha del corte</label><select id="dateFilter"></select></div>
+            </div>
+            <div id="hourlySummary" style="margin-top:14px"></div>
+          </div>
+
+          <div class="card" style="box-shadow:none">
+            <div class="section-title">🎯 Atribución</div>
+            <p class="note">La atribución se registra por caso. Si seleccionas <strong>Atribuible a nosotros</strong>, debes explicar el motivo. Si seleccionas <strong>No atribuible</strong>, no se solicita explicación.</p>
+            <div class="tip"><strong>Regla:</strong> la clasificación es una evaluación del equipo sobre si la experiencia/resultado depende principalmente de nuestra atención y comunicación.</div>
+            <div style="margin-top:12px"><button class="btn secondary" id="exportExcelBtn" type="button">📥 Exportar revisión a Excel</button></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px">
+          <div class="section-title">📋 Revisión de casos</div>
+          <div class="table-wrap">
+            <table class="table case-table">
+              <thead>
+                <tr>
+                  <th>Hora</th><th>Caso</th><th>Agente</th><th>NPS</th><th>CSAT</th><th>Verbatim</th><th>Atribución</th><th>Motivo de atribución</th>
+                </tr>
+              </thead>
+              <tbody id="caseReviewBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="nps" class="page hidden">
+    <div class="card">
+      <div class="section-title">Mi NPS</div>
+      <p class="subtitle">NPS = % Promotores − % Detractores.</p>
+      <div class="three">
+        <div><label>Promotores (9–10)</label><input id="promoters" type="number" min="0" value="0"></div>
+        <div><label>Pasivos (7–8)</label><input id="passives" type="number" min="0" value="0"></div>
+        <div><label>Detractores (0–6)</label><input id="detractors" type="number" min="0" value="0"></div>
+      </div>
+      <div style="margin-top:16px"><button class="btn primary" id="saveNpsBtn">Calcular y guardar</button></div>
+      <div id="npsResult" class="result" style="margin-top:16px">Ingresa las respuestas para calcular tu NPS.</div>
+    </div>
+  </section>
+
+  <section id="csat" class="page hidden">
+    <div class="card">
+      <div class="section-title">Mi CSAT</div>
+      <p class="subtitle">Para la escala 1–7 de tu archivo, la V1 usa por defecto Top 2: respuestas 6–7 como satisfactorias.</p>
+      <div class="row">
+        <div><label>Respuestas satisfactorias</label><input id="sat" type="number" min="0" value="0"></div>
+        <div><label>Total de respuestas</label><input id="totalSat" type="number" min="0" value="0"></div>
+      </div>
+      <div style="margin-top:16px"><button class="btn primary" id="saveCsatBtn">Calcular y guardar</button></div>
+      <div id="csatResult" class="result" style="margin-top:16px">Ingresa las respuestas para calcular tu CSAT.</div>
+    </div>
+  </section>
+
+  <section id="coach" class="page hidden">
+    <div class="two">
+      <div class="card"><div class="section-title">Coach de una interacción</div>
+        <form id="feedbackForm">
+          <div><label>¿Cómo terminó la interacción?</label><select id="outcome"><option value="resolved">Se resolvió correctamente</option><option value="partial">Se resolvió parcialmente</option><option value="unresolved">No se resolvió</option></select></div>
+          <div><label>Conducta que más utilizaste</label><select id="behavior"><option value="empatía">Empatía y escucha</option><option value="claridad">Claridad de la información</option><option value="ownership">Me hice responsable del caso</option><option value="rapidez">Rapidez</option><option value="none">Sentí que me faltó conectar con el consumidor</option></select></div>
+          <div><label>Expectativa principal del consumidor</label><select id="expectation"><option>Resolver mi solicitud</option><option>Ser escuchado y comprendido</option><option>Recibir información clara</option><option>Obtener una respuesta rápida</option><option>Sentir confianza y seguridad</option></select></div>
+          <div><label>Comentario opcional</label><textarea id="interactionNote" placeholder="¿Qué ocurrió?"></textarea></div>
+          <button class="btn primary">Generar feedback</button>
+        </form>
+      </div>
+      <div class="card"><div class="section-title">Feedback del coach</div><div id="feedbackOutput" class="result">Completa la interacción y recibirás recomendaciones.</div>
+        <div id="effectivenessBox" class="hidden" style="margin-top:12px">
+          <label>¿La sugerencia fue efectiva?</label>
+          <div class="row"><button type="button" class="btn primary" data-effect="effective">🟢 Sí, fue efectiva</button><button type="button" class="btn ghost" data-effect="partial">🟡 Parcialmente</button></div>
+          <button type="button" class="btn danger" data-effect="not-effective" style="margin-top:8px;width:100%">🔴 No fue efectiva</button>
+          <div id="effectNoteWrap" class="hidden" style="margin-top:10px"><textarea id="effectNote" placeholder="¿Qué ocurrió o qué habría que mejorar?"></textarea><button type="button" class="btn secondary" id="saveEffectBtn" style="margin-top:8px">Guardar evaluación</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="consumer" class="page hidden">
+    <div class="two">
+      <div class="card"><div class="section-title">¿Qué tipo de consumidor tienes enfrente?</div><label>Selecciona el escenario</label>
+        <select id="consumerType"><option value="">Selecciona...</option><option value="angry">Está molesto</option><option value="repetitive">Repite la solicitud / insiste</option><option value="confused">No entiende la información</option><option value="urgent">Tiene mucha urgencia</option><option value="silent">Está distante o responde poco</option><option value="unreasonable">La expectativa no es viable</option></select>
+        <div id="consumerAdvice" style="margin-top:16px"></div>
+      </div>
+      <div class="card"><div class="section-title">Ruta para crear un promotor</div>
+        <div class="feedback"><strong>1. Reconoce</strong>Demuestra que entendiste lo que le importa.</div>
+        <div class="feedback"><strong>2. Alinea</strong>Explica qué puedes hacer y qué no puedes hacer.</div>
+        <div class="feedback"><strong>3. Resuelve</strong>Entrega una acción concreta, no solo información.</div>
+        <div class="feedback"><strong>4. Confirma</strong>Pregunta si la solución responde a su necesidad.</div>
+        <div class="feedback"><strong>5. Cierra</strong>Deja al consumidor con seguridad sobre el siguiente paso.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="history" class="page hidden">
+    <div class="card"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div class="section-title">Mis registros</div><button class="btn danger" id="clearHistoryBtn">Borrar historial</button></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Fecha</th><th>Tipo</th><th>Resultado</th><th>Detalle</th></tr></thead><tbody id="historyBody"></tbody></table></div>
+    </div>
+  </section>
+  <div class="footer">CCC Coach V1 · Calculadora manual + análisis automático de encuesta</div>
+</main>
+</div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script>
+const KEY='cccCoachV1';
+let data=JSON.parse(localStorage.getItem(KEY)||'{"profile":{"name":"","npsGoal":70},"nps":{"p":0,"pa":0,"d":0},"csat":{"sat":0,"total":0},"history":[],"coachEvaluations":[],"attributionReviews":[]}');
+if(!Array.isArray(data.attributionReviews)) data.attributionReviews=[];
+let importedCases=[];
+let importedRows=[];
+let importedHeaders=[];
+let lastCoachIndex=-1;
+
+function save(){localStorage.setItem(KEY,JSON.stringify(data));}
+function pct(n,d){return d?Math.round((n/d)*1000)/10:0}
+function getNPS(){const t=data.nps.p+data.nps.pa+data.nps.d;return t?Math.round((data.nps.p/t*100)-(data.nps.d/t*100)):0}
+function getCSAT(){return pct(data.csat.sat,data.csat.total)}
+function nav(page){
+ document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));
+ document.getElementById(page).classList.remove('hidden');
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+ const titles={dashboard:'Mi desempeño',calculator:'Calculadora NPS / CSAT',nps:'Mi NPS',csat:'Mi CSAT',coach:'Coach de atención',consumer:'Manejo del consumidor',history:'Mis registros'};
+ document.getElementById('pageTitle').textContent=titles[page];
+ if(page==='history')renderHistory();
+}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.page)));
+
+function saveProfile(){
+ data.profile.name=document.getElementById('agentName').value.trim()||'Mi nombre';
+ data.profile.npsGoal=Number(document.getElementById('npsGoal').value)||70;
+ save();updateDashboard();alert('Perfil guardado.');
+}
+function updateDashboard(){
+ document.getElementById('agentName').value=data.profile.name||'';
+ document.getElementById('agentNameTop').textContent=data.profile.name||'Mi nombre';
+ document.getElementById('npsGoal').value=data.profile.npsGoal||70;
+ const n=getNPS(),c=getCSAT(), evals=data.coachEvaluations||[], eff=evals.filter(x=>x.rating==='effective').length;
+ const nEl=document.getElementById('dashNps');nEl.textContent=n;nEl.className='value '+(n>=data.profile.npsGoal?'green':n>=0?'yellow':'red');
+ document.getElementById('npsStatus').textContent=(data.nps.p+data.nps.pa+data.nps.d)+' encuestas · meta '+data.profile.npsGoal;
+ const cEl=document.getElementById('dashCsat');cEl.textContent=c+'%';cEl.className='value '+(c>=85?'green':c>=70?'yellow':'red');
+ document.getElementById('csatStatus').textContent=data.csat.total+' respuestas';
+ document.getElementById('dashPromoters').textContent=data.nps.p;
+ document.getElementById('dashCoach').textContent=pct(eff,evals.length)+'%';
+ let focus='Registra una interacción en Coach de atención para recibir recomendaciones.';
+ if(data.history.length)focus=evals.length?'Usa las evaluaciones de efectividad para identificar qué recomendaciones realmente funcionan.':'Tu siguiente paso es evaluar si el coaching generado fue efectivo.';
+ document.getElementById('focusBox').innerHTML='<strong>'+focus+'</strong><br><br>Objetivo: que el consumidor no solo reciba una respuesta, sino que sienta que su necesidad fue comprendida y atendida.';
+}
+
+function renderNpsResult(el,p,pa,d){
+ const t=p+pa+d;if(!t){el.textContent='Ingresa al menos una respuesta.';return null}
+ const n=Math.round(p/t*100-d/t*100);
+ el.innerHTML='<div class="big">'+n+'</div><strong>NPS</strong><br><small>'+pct(p,t)+'% promotores − '+pct(d,t)+'% detractores · '+t+' respuestas</small><div class="bar"><i style="width:'+Math.max(0,Math.min(100,(n+100)/2))+'%"></i></div>';
+ return n;
+}
+function calculateNPS(saveIt=true){
+ const p=Math.max(0,Number(document.getElementById(saveIt?'promoters':'calcP').value)||0);
+ const pa=Math.max(0,Number(document.getElementById(saveIt?'passives':'calcPa').value)||0);
+ const d=Math.max(0,Number(document.getElementById(saveIt?'detractors':'calcD').value)||0);
+ const el=document.getElementById(saveIt?'npsResult':'calcNpsOut');
+ const n=renderNpsResult(el,p,pa,d);if(n===null)return;
+ if(saveIt){data.nps={p,pa,d};data.history.unshift({date:new Date().toLocaleString(),type:'NPS',result:'NPS '+n,detail:'Promotores '+p+' · Neutrales '+pa+' · Detractores '+d});save();updateDashboard();}
+}
+function calculateCSAT(saveIt=true){
+ const sat=Math.max(0,Number(document.getElementById(saveIt?'sat':'calcSat').value)||0);
+ const total=Math.max(0,Number(document.getElementById(saveIt?'totalSat':'calcTotal').value)||0);
+ const el=document.getElementById(saveIt?'csatResult':'calcCsatOut');
+ if(!total){el.textContent='Ingresa un total de respuestas mayor que cero.';return}
+ if(sat>total){el.textContent='Las respuestas satisfactorias no pueden superar el total.';return}
+ const c=pct(sat,total);el.innerHTML='<div class="big">'+c+'%</div><strong>CSAT</strong><br><small>'+sat+' respuestas satisfactorias de '+total+'</small><div class="bar"><i style="width:'+c+'%"></i></div>';
+ if(saveIt){data.csat={sat,total};data.history.unshift({date:new Date().toLocaleString(),type:'CSAT',result:'CSAT '+c+'%',detail:'Satisfactorias '+sat+' de '+total});save();updateDashboard();}
+}
+
+
+function detectColumn(headers,patterns){
+ return headers.findIndex(h=>patterns.some(p=>String(h||'').toLowerCase().trim().includes(p)));
+}
+function parseResponse(v){
+ if(v===null||v===undefined||v==='')return null;
+ const m=String(v).match(/-?\d+(?:[.,]\d+)?/);return m?Number(m[0].replace(',','.')):null;
+}
+function questionType(q){
+ const s=String(q||'').toLowerCase();
+ if(s.includes('satisfecho')||s.includes('satisfacción')||s.includes('satisfaccion')||s.includes('satisfaction'))return 'csat';
+ if(s.includes('recomend')||s.includes('probable')||s.includes('recommend'))return 'nps';
+ return null;
+}
+function parseDateTime(v){
+ if(v instanceof Date && !isNaN(v)) return new Date(v);
+ if(v===null||v===undefined||v==='') return null;
+ const s=String(v).trim();
+ let m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?:\s*(AM|PM))?)?$/i);
+ if(m){
+   let day=+m[1],mon=+m[2]-1,year=+m[3],h=+(m[4]||0),min=+(m[5]||0);
+   const ap=(m[6]||'').toUpperCase(); if(ap==='PM'&&h<12)h+=12;if(ap==='AM'&&h===12)h=0;
+   const d=new Date(year,mon,day,h,min,0); return isNaN(d)?null:d;
+ }
+ const d=new Date(s); return isNaN(d)?null:d;
+}
+function formatHour(d){return d?String(d.getHours()).padStart(2,'0')+':00':'Sin hora'}
+function formatDate(d){return d?String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear():''}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function analyzeRows(rows, source){
+ if(!rows.length)throw new Error('El archivo no contiene filas de datos.');
+ const headers=Object.keys(rows[0]);
+ const qIdx=detectColumn(headers,['question name','pregunta','question']);
+ const rIdx=detectColumn(headers,['response','respuesta']);
+ const caseIdx=detectColumn(headers,['case number','case','caso']);
+ const verbIdx=detectColumn(headers,['verbatim','comentario']);
+ const ownerIdx=detectColumn(headers,['case owner','agent','agente']);
+ const timeCandidates=source==='GCCP'
+   ? headers.filter(h=>String(h).trim().toLowerCase()==='created date' || /created date/i.test(String(h)))
+   : [...headers.filter(h=>/date\/time|date time|fecha.*hora|hora.*fecha/i.test(String(h))),...headers.filter(h=>/created date|opened|closed|fecha/i.test(String(h)))].filter((v,i,a)=>a.indexOf(v)===i);
+ if(qIdx<0||rIdx<0)throw new Error('No pude encontrar las columnas de pregunta y respuesta.');
+ if(caseIdx<0)throw new Error('No pude encontrar Case Number/Caso. La revisión por atribución necesita un identificador de caso.');
+ const qh=headers[qIdx],rh=headers[rIdx],ch=headers[caseIdx],vh=verbIdx>=0?headers[verbIdx]:null,oh=ownerIdx>=0?headers[ownerIdx]:null;
+ const timeFields=timeCandidates.length?timeCandidates:[];
+ const casesMap=new Map();
+ rows.forEach(row=>{
+   const id=String(row[ch]??'').trim(); if(!id)return;
+   if(!casesMap.has(id))casesMap.set(id,{case:id,nps:null,csat:null,verbatim:vh?String(row[vh]||''):'',owner:oh?String(row[oh]||''):'',times:{},rows:[],sources:[source]});
+   const c=casesMap.get(id); c.rows.push(row); if(!c.sources.includes(source))c.sources.push(source);
+   if(!c.verbatim && vh)c.verbatim=String(row[vh]||'');
+   const type=questionType(row[qh]),val=parseResponse(row[rh]);
+   if(type==='nps'&&val!==null&&val>=0&&val<=10)c.nps=val;
+   if(type==='csat'&&val!==null&&val>=1&&val<=10)c.csat=val;
+   timeFields.forEach(f=>{const d=parseDateTime(row[f]);if(d)c.times[f]=d;});
+ });
+ return {cases:[...casesMap.values()],headers,qh,rh,ch,vh,oh,timeFields,source};
+}
+
+function getSavedAttribution(caseId){
+ return data.attributionReviews.find(x=>String(x.case)===String(caseId))||null;
+}
+function saveAttribution(caseId,rating,reason){
+ const idx=data.attributionReviews.findIndex(x=>String(x.case)===String(caseId));
+ const item={case:String(caseId),attribution:rating,reason:rating==='Atribuible a nosotros'?reason.trim():'',updatedAt:new Date().toLocaleString()};
+ if(idx>=0)data.attributionReviews[idx]=item;else data.attributionReviews.push(item);
+ save();
+}
+function renderHourlyReview(){
+ if(!importedCases.length)return;
+ const field=document.getElementById('timeField').value;
+ const date=document.getElementById('dateFilter').value;
+ const filtered=importedCases.filter(c=>{
+   const d=c.times[field]; return d && (!date||formatDate(d)===date);
+ });
+ const counts={};
+ filtered.forEach(c=>{const h=formatHour(c.times[field]);if(!counts[h])counts[h]={cases:0,nps:0,csat:0,attr:0,noattr:0,pending:0};counts[h].cases++;if(c.nps!==null)counts[h].nps++;if(c.csat!==null)counts[h].csat++;const a=getSavedAttribution(c.case);if(!a)counts[h].pending++;else if(a.attribution==='Atribuible a nosotros')counts[h].attr++;else counts[h].noattr++;});
+ const hours=Object.keys(counts).sort();
+ const summary=document.getElementById('hourlySummary');
+ summary.innerHTML='<div class="table-wrap"><table class="table hourly-table"><thead><tr><th>Hora</th><th>Casos</th><th>NPS</th><th>CSAT</th><th>Atribuibles</th><th>No atribuibles</th><th>Pendientes</th></tr></thead><tbody>'+
+   (hours.length?hours.map(h=>{const x=counts[h];return `<tr><td><strong>${h}</strong></td><td>${x.cases}</td><td>${x.nps}</td><td>${x.csat}</td><td class="green">${x.attr}</td><td>${x.noattr}</td><td class="${x.pending?'yellow':''}">${x.pending}</td></tr>`}).join(''):'<tr><td colspan="7">No hay casos para el filtro seleccionado.</td></tr>')+
+   '</tbody></table></div>';
+ renderCaseReview(filtered);
+}
+function renderCaseReview(cases){
+ const body=document.getElementById('caseReviewBody');
+ if(!cases.length){body.innerHTML='<tr><td colspan="8">No hay casos para el filtro seleccionado.</td></tr>';return;}
+ body.innerHTML=cases.map(c=>{
+   const saved=getSavedAttribution(c.case);
+   const attr=saved?.attribution||'';
+   const reason=saved?.reason||'';
+   const d=c.times[document.getElementById('timeField').value];
+   const status=attr==='Atribuible a nosotros'?'status-attr':attr==='No atribuible'?'status-noattr':'status-pending';
+   return `<tr>
+     <td>${formatHour(d)}</td>
+     <td><strong>${escapeHtml(c.case)}</strong></td>
+     <td>${escapeHtml(c.owner)}</td>
+     <td>${c.nps===null?'—':c.nps}</td>
+     <td>${c.csat===null?'—':c.csat}</td>
+     <td style="max-width:320px">${escapeHtml(c.verbatim)}</td>
+     <td>
+       <select class="attrib-select ${status}" data-case="${escapeHtml(c.case)}">
+         <option value="">Seleccionar</option>
+         <option value="Atribuible a nosotros" ${attr==='Atribuible a nosotros'?'selected':''}>Atribuible a nosotros</option>
+         <option value="No atribuible" ${attr==='No atribuible'?'selected':''}>No atribuible</option>
+       </select>
+     </td>
+     <td>
+       <textarea class="attrib-reason" data-case="${escapeHtml(c.case)}" placeholder="Escribe por qué es atribuible..." ${attr==='Atribuible a nosotros'?'':'disabled'}>${escapeHtml(reason)}</textarea>
+     </td>
+   </tr>`;
+ }).join('');
+ body.querySelectorAll('.attrib-select').forEach(sel=>{
+   sel.addEventListener('change',()=>{
+     const id=sel.dataset.case, reasonEl=body.querySelector(`.attrib-reason[data-case="${CSS.escape(id)}"]`);
+     if(sel.value==='Atribuible a nosotros'){
+       reasonEl.disabled=false;reasonEl.focus();
+       sel.className='attrib-select status-attr';
+       saveAttribution(id,sel.value,reasonEl.value);
+     }else if(sel.value==='No atribuible'){
+       reasonEl.disabled=true;reasonEl.value='';
+       sel.className='attrib-select status-noattr';
+       saveAttribution(id,sel.value,'');
+     }else{
+       reasonEl.disabled=true;reasonEl.value='';
+     }
+     renderHourlyReview();
+   });
+ });
+ body.querySelectorAll('.attrib-reason').forEach(t=>{
+   t.addEventListener('blur',()=>{
+     const sel=body.querySelector(`.attrib-select[data-case="${CSS.escape(t.dataset.case)}"]`);
+     if(sel?.value==='Atribuible a nosotros'){
+       if(!t.value.trim()){alert('Si el caso es atribuible a nosotros, debes explicar el motivo.');t.focus();return;}
+       saveAttribution(t.dataset.case,sel.value,t.value);
+       renderHourlyReview();
+     }
+   });
+ });
+}
+function populateTimeControls(result){
+ const timeField=document.getElementById('timeField'),dateFilter=document.getElementById('dateFilter');
+ timeField.innerHTML=result.timeFields.map(f=>`<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join('');
+ const preferred=result.timeFields.find(f=>/closed|cerrad/i.test(f))||result.timeFields.find(f=>/created|cread/i.test(f))||result.timeFields[0];
+ if(preferred)timeField.value=preferred;
+ const field=preferred||result.timeFields[0];
+ const dates=[...new Set(importedCases.map(c=>c.times[field]).filter(Boolean).map(formatDate))].sort((a,b)=>{const [ad,am,ay]=a.split('/').map(Number),[bd,bm,by]=b.split('/').map(Number);return new Date(ay,am-1,ad)-new Date(by,bm-1,bd);});
+ dateFilter.innerHTML='<option value="">Todas las fechas</option>'+dates.map(d=>`<option value="${d}">${d}</option>`).join('');
+ timeField.addEventListener('change',()=>{
+   const ds=[...new Set(importedCases.map(c=>c.times[timeField.value]).filter(Boolean).map(formatDate))].sort();
+   dateFilter.innerHTML='<option value="">Todas las fechas</option>'+ds.map(d=>`<option value="${d}">${d}</option>`).join('');
+   renderHourlyReview();
+ });
+ dateFilter.addEventListener('change',renderHourlyReview);
+}
+
+function buildExportRows(){
+ const field=document.getElementById('timeField').value,date=document.getElementById('dateFilter').value;
+ return importedCases.filter(c=>{const d=c.times[field];return d&&(!date||formatDate(d)===date);}).map(c=>{
+   const a=getSavedAttribution(c.case),d=c.times[field];
+   return {'Fecha':formatDate(d),'Hora':formatHour(d),'Caso':c.case,'Agente':c.owner,'NPS':c.nps??'','CSAT':c.csat??'','Verbatim':c.verbatim,'Atribución':a?.attribution||'Pendiente','Motivo de atribución':a?.attribution==='Atribuible a nosotros'?(a.reason||''):'','Última actualización':a?.updatedAt||''};
+ });
+}
+function exportReviewExcel(){
+ if(!importedCases.length){alert('Primero carga un Excel.');return;}
+ const rows=buildExportRows();
+ const hourly={};
+ rows.forEach(r=>{const k=r.Hora;if(!hourly[k])hourly[k]={Hora:k,Casos:0,NPS:0,CSAT:0,Atribuibles:0,'No atribuibles':0,Pendientes:0};hourly[k].Casos++;if(r.NPS!=='')hourly[k].NPS++;if(r.CSAT!=='')hourly[k].CSAT++;if(r.Atribución==='Atribuible a nosotros')hourly[k].Atribuibles++;else if(r.Atribución==='No atribuible')hourly[k]['No atribuibles']++;else hourly[k].Pendientes++;});
+ const summary=[{Indicador:'NPS',Valor:getNPS(),Promotores:data.nps.p,Neutrales:data.nps.pa,Detractores:data.nps.d},{Indicador:'CSAT',Valor:getCSAT()+'%',Promotores:'',Neutrales:'',Detractores:''}];
+ const wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Detalle atribución');
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(Object.values(hourly).sort((a,b)=>a.Hora.localeCompare(b.Hora))),'Corte por hora');
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(summary),'Resumen');
+ XLSX.writeFile(wb,'CCC_Coach_Revision_NPS_CSAT_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+async function handleExcelFiles(){
+ const status=document.getElementById('excelStatus'),out=document.getElementById('autoResult'),review=document.getElementById('hourlyReview');
+ const selected=[{id:'gccpFile',source:'GCCP'},{id:'sprinklrFile',source:'Sprinklr'}].map(x=>({...x,file:document.getElementById(x.id).files[0]})).filter(x=>x.file);
+ if(!selected.length){status.textContent='Selecciona GCCP, Sprinklr o ambas bases.';return;}
+ status.textContent='Leyendo base(s)...';out.classList.add('hidden');review.classList.add('hidden');
+ try{
+   if(typeof XLSX==='undefined')throw new Error('No se cargó el lector de Excel. Abre el archivo con conexión a internet.');
+   let merged=new Map(),allRows=0,allHeaders=[],allTimeFields=[],sourceMessages=[];
+   for(const item of selected){
+     const buf=await item.file.arrayBuffer(),wb=XLSX.read(buf,{type:'array',cellDates:true});
+     const ws=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:true});
+     const result=analyzeRows(rows,item.source); allRows+=rows.length; allHeaders.push(...result.headers); sourceMessages.push(item.source+': '+item.file.name);
+     result.timeFields.forEach(f=>{if(!allTimeFields.includes(f))allTimeFields.push(f)});
+     result.cases.forEach(c=>{
+       const old=merged.get(c.case);
+       if(!old){merged.set(c.case,c);return;}
+       if(c.nps!==null)old.nps=c.nps;if(c.csat!==null)old.csat=c.csat;
+       if(!old.verbatim&&c.verbatim)old.verbatim=c.verbatim;if(!old.owner&&c.owner)old.owner=c.owner;
+       old.rows.push(...c.rows);c.sources.forEach(x=>{if(!old.sources.includes(x))old.sources.push(x)});
+       Object.entries(c.times).forEach(([k,v])=>{if(!old.times[k] || (c.sources.includes('GCCP')&&/created date/i.test(k)))old.times[k]=v});
+     });
+   }
+   importedCases=[...merged.values()];importedRows=[];importedHeaders=[...new Set(allHeaders)];
+   if(!allTimeFields.length)throw new Error('No encontré fecha/hora. En GCCP se necesita la columna O “Created Date”.');
+   // GCCP Created Date has priority for hourly cuts whenever GCCP was uploaded.
+   const gccpDateField=allTimeFields.find(f=>/created date/i.test(f));
+   if(selected.some(x=>x.source==='GCCP')&&gccpDateField){allTimeFields=[gccpDateField,...allTimeFields.filter(f=>f!==gccpDateField)];}
+   const npsRows=importedCases.filter(c=>c.nps!==null),p=npsRows.filter(c=>c.nps>=9).length,pa=npsRows.filter(c=>c.nps>=7&&c.nps<=8).length,d=npsRows.filter(c=>c.nps<=6).length;
+   const csatRows=importedCases.filter(c=>c.csat!==null),sat=csatRows.filter(c=>c.csat>=6).length;
+   const n=p+pa+d,nps=n?Math.round(p/n*100-d/n*100):0,cs=pct(sat,csatRows.length);
+   document.getElementById('calcP').value=p;document.getElementById('calcPa').value=pa;document.getElementById('calcD').value=d;
+   document.getElementById('calcSat').value=sat;document.getElementById('calcTotal').value=csatRows.length;
+   renderNpsResult(document.getElementById('calcNpsOut'),p,pa,d);
+   document.getElementById('calcCsatOut').innerHTML=`<div class="big">${cs}%</div><strong>CSAT</strong><br><small>${sat} satisfactorias de ${csatRows.length} · Top 2: 6–7</small><div class="bar"><i style="width:${cs}%"></i></div>`;
+   out.classList.remove('hidden');
+   out.innerHTML=`<strong>Resultado automático consolidado</strong><div class="calc-result"><div class="mini"><strong>NPS</strong><div class="big">${nps}</div><small>Promotores: ${p} · Neutrales: ${pa} · Detractores: ${d}</small></div><div class="mini"><strong>CSAT</strong><div class="big">${cs}%</div><small>Satisfactorias: ${sat} de ${csatRows.length}</small></div></div><p class="note" style="margin-top:12px">Bases cargadas: ${sourceMessages.map(escapeHtml).join(' · ')}<br>Filas procesadas: ${allRows} · Casos únicos consolidados: ${importedCases.length}. ${selected.some(x=>x.source==='GCCP')?'Para GCCP, el corte horario prioriza Created Date (columna O).':''}</p>`;
+   populateTimeControls({timeFields:allTimeFields});review.classList.remove('hidden');
+   // Default to today's date if present; otherwise latest date available, to avoid mixing days.
+   const timeField=document.getElementById('timeField');
+   if(gccpDateField&&selected.some(x=>x.source==='GCCP'))timeField.value=gccpDateField;
+   const dates=[...new Set(importedCases.map(c=>c.times[timeField.value]).filter(Boolean).map(formatDate))].sort((a,b)=>{const [ad,am,ay]=a.split('/').map(Number),[bd,bm,by]=b.split('/').map(Number);return new Date(ay,am-1,ad)-new Date(by,bm-1,bd)});
+   if(dates.length){const today=formatDate(new Date());document.getElementById('dateFilter').value=dates.includes(today)?today:dates[dates.length-1];}
+   renderHourlyReview();
+   status.textContent='Procesado correctamente. '+selected.map(x=>x.source).join(' + ')+'. Puedes trabajar con una sola base o con ambas.';
+ }catch(e){status.textContent='Error: '+e.message;out.classList.remove('hidden');out.textContent='No fue posible procesar el archivo. Revisa que la base tenga las columnas de pregunta, respuesta y caso.';}
+}
+
+const advice={
+angry:{title:'Consumidor molesto',do:['No interrumpas en los primeros segundos.','Reconoce la molestia sin discutir.','Lleva la conversación de la emoción hacia una acción concreta.'],say:'Entiendo por qué esta situación te genera molestia. Permíteme revisar qué puedo hacer para solucionarlo contigo.',avoid:'“Eso no es culpa mía” o “ya le expliqué”.'},
+repetitive:{title:'Consumidor insistente',do:['Resume lo que ya entendiste.','Explica el siguiente paso con precisión.','Confirma qué resultado espera.'],say:'Para asegurarme de ayudarte correctamente, entiendo que lo que necesitas es ____. Lo que puedo hacer ahora es ____.',avoid:'Repetir la misma respuesta sin agregar una acción.'},
+confused:{title:'Consumidor confundido',do:['Reduce la cantidad de información.','Habla en pasos.','Pide confirmación de comprensión.'],say:'Te lo explico en dos pasos: primero ____, después ____. ¿Hasta aquí vamos bien?',avoid:'Usar términos técnicos o dar demasiadas instrucciones juntas.'},
+urgent:{title:'Consumidor con urgencia',do:['Identifica qué parte es realmente urgente.','Entrega el primer paso inmediatamente.','Da un tiempo o condición clara cuando aplique.'],say:'Entiendo que necesitas resolverlo cuanto antes. Voy a enfocarme primero en ____ y luego te indico el siguiente paso.',avoid:'Prometer algo que no puedes garantizar.'},
+silent:{title:'Consumidor distante',do:['Haz preguntas abiertas pero simples.','Escucha silencios sin presionar.','Resume lo que tienes hasta ahora.'],say:'Quiero asegurarme de entenderte bien. ¿Qué sería lo más importante que resolvamos hoy?',avoid:'Interpretar el silencio como falta de interés.'},
+unreasonable:{title:'Expectativa no viable',do:['Valida la necesidad, no necesariamente la expectativa.','Explica el límite con claridad.','Ofrece la mejor alternativa disponible.'],say:'Entiendo lo que esperabas conseguir. En este caso esa opción no está disponible, pero sí puedo ofrecerte ____.',avoid:'Decir simplemente “no se puede” sin alternativa.'}
+};
+function showConsumerAdvice(){
+ const v=document.getElementById('consumerType').value,box=document.getElementById('consumerAdvice');if(!v){box.innerHTML='';return}
+ const a=advice[v];box.innerHTML='<div class="feedback"><strong>'+a.title+'</strong><ul>'+a.do.map(x=>'<li>'+x+'</li>').join('')+'</ul><strong>Frase recomendada</strong><p>“'+a.say+'”</p><strong>Evita</strong><p>'+a.avoid+'</p></div>';
+}
+function generateFeedback(e){
+ e.preventDefault();const outcome=document.getElementById('outcome').value,behavior=document.getElementById('behavior').value,exp=document.getElementById('expectation').value,note=document.getElementById('interactionNote').value;
+ let positives=[],improvements=[];
+ if(behavior==='empatía')positives.push('Usaste empatía y escucha: esto ayuda a que el consumidor se sienta comprendido.');
+ if(behavior==='ownership')positives.push('Mostraste sentido de responsabilidad sobre el caso.');
+ if(behavior==='claridad')positives.push('La claridad reduce incertidumbre y facilita la confianza.');
+ if(behavior==='rapidez')positives.push('La rapidez es valiosa cuando está acompañada de una solución correcta.');
+ if(behavior==='none')improvements.push('Trabaja una apertura empática antes de entrar directamente a la solución.');
+ if(outcome!=='resolved')improvements.push('Busca cerrar con una acción concreta o una alternativa viable.');
+ if(exp==='Ser escuchado y comprendido')improvements.push('Valida explícitamente la emoción o necesidad antes de explicar el proceso.');
+ if(exp==='Recibir información clara')improvements.push('Utiliza lenguaje sencillo y termina confirmando comprensión.');
+ if(exp==='Sentir confianza y seguridad')improvements.push('Explica qué ocurrirá después y qué puede esperar el consumidor.');
+ if(!improvements.length)improvements.push('Mantén el hábito de confirmar la satisfacción antes de cerrar.');
+ const html=positives.map(x=>'<div class="feedback"><strong>Fortaleza</strong>'+x+'</div>').join('')+improvements.map(x=>'<div class="feedback" style="border-left-color:var(--yellow)"><strong>Oportunidad</strong>'+x+'</div>').join('')+'<div class="tip"><strong>Expectativa detectada:</strong> '+exp+'<br><br><strong>Micro-hábito:</strong> antes de despedirte pregunta: “¿Hay algo más que pueda aclararte o ayudarte a resolver?”</div>';
+ document.getElementById('feedbackOutput').innerHTML=html;document.getElementById('effectivenessBox').classList.remove('hidden');
+ data.history.unshift({date:new Date().toLocaleString(),type:'Feedback',result:outcome==='resolved'?'Atención correcta':'Oportunidad de mejora',detail:exp+(note?' · '+note:'')});
+ lastCoachIndex=data.history.length-1;save();updateDashboard();
+}
+function renderHistory(){
+ const body=document.getElementById('historyBody');if(!data.history.length){body.innerHTML='<tr><td colspan="4">Todavía no hay registros.</td></tr>';return}
+ body.innerHTML=data.history.map(x=>'<tr><td>'+x.date+'</td><td><span class="badge">'+x.type+'</span></td><td>'+x.result+'</td><td>'+x.detail+'</td></tr>').join('');
+}
+function clearHistory(){if(confirm('¿Seguro que quieres borrar todos los registros?')){data.history=[];data.coachEvaluations=[];save();renderHistory();updateDashboard();}}
+function chooseEffect(rating){
+ document.getElementById('effectNoteWrap').classList.remove('hidden');
+ document.getElementById('effectNote').dataset.rating=rating;
+ document.getElementById('effectNote').focus();
+}
+function saveEffect(){
+ const rating=document.getElementById('effectNote').dataset.rating||'partial',note=document.getElementById('effectNote').value.trim();
+ data.coachEvaluations.push({date:new Date().toLocaleString(),rating,note});
+ data.history.unshift({date:new Date().toLocaleString(),type:'Coach',result:rating==='effective'?'Sugerencia efectiva':rating==='partial'?'Sugerencia parcialmente efectiva':'Sugerencia no efectiva',detail:note||'Sin comentario'});
+ save();updateDashboard();renderHistory();document.getElementById('effectNoteWrap').classList.add('hidden');document.getElementById('effectNote').value='';alert('Evaluación guardada.');
+}
+
+document.getElementById('saveProfileBtn').addEventListener('click',saveProfile);
+document.getElementById('calcNpsBtn').addEventListener('click',()=>calculateNPS(false));
+document.getElementById('calcCsatBtn').addEventListener('click',()=>calculateCSAT(false));
+document.getElementById('saveNpsBtn').addEventListener('click',()=>calculateNPS(true));
+document.getElementById('saveCsatBtn').addEventListener('click',()=>calculateCSAT(true));
+document.getElementById('gccpFile').addEventListener('change',handleExcelFiles);
+document.getElementById('sprinklrFile').addEventListener('change',handleExcelFiles);
+document.getElementById('exportExcelBtn').addEventListener('click',exportReviewExcel);
+document.getElementById('consumerType').addEventListener('change',showConsumerAdvice);
+document.getElementById('feedbackForm').addEventListener('submit',generateFeedback);
+document.querySelectorAll('[data-effect]').forEach(b=>b.addEventListener('click',()=>chooseEffect(b.dataset.effect)));
+document.getElementById('saveEffectBtn').addEventListener('click',saveEffect);
+document.getElementById('clearHistoryBtn').addEventListener('click',clearHistory);
+document.getElementById('agentName').value=data.profile.name||'';
+document.getElementById('npsGoal').value=data.profile.npsGoal||70;
+updateDashboard();
+</script>
+</body>
+</html>
